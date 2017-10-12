@@ -4,6 +4,22 @@ using System.Text;
 
 namespace SplayTree
 {
+
+    class SplayTree
+    {
+        SplayNode Root { get; set; }
+
+        public void Insert(int key)
+        {
+            
+        }
+
+        public void Find(int key)
+        {
+
+        }
+    }
+
     class SplayNode
     {
         public int Key { get; private set; }
