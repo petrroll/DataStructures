@@ -11,8 +11,7 @@ namespace SplayTree
             string line;
             while((line = Console.ReadLine()) != null)
             {
-                Char command = line[0];
-                int number = ParseNumber(line);
+                (int number, char command) = ParseNumber(line);
 
                 switch (command)
                 {
@@ -34,7 +33,7 @@ namespace SplayTree
 
         }
 
-        private static int ParseNumber(string line)
+        private static (int number, char command) ParseNumber(string line)
         {
             int number = 0;
             for (int i = 2; i < line.Length; i++, number *= 10)
@@ -43,7 +42,7 @@ namespace SplayTree
             }
 
             number /= 10;
-            return number;
+            return (number, line[0]);
         }
     }
 }
