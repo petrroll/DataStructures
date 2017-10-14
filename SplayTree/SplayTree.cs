@@ -45,15 +45,15 @@ namespace SplayTree
                 length++;
                 int currKey = currNode.Key;
 
-                if (key == currKey) { Console.WriteLine($"S: {length}"); return; }
+                if (key == currKey) { Console.WriteLine($"S {length}"); return; }
                 else if (key > currKey)
                 {
-                    if (currNode.RightSon == null) { Console.WriteLine($"F: {length}"); return; }
+                    if (currNode.RightSon == null) { Console.WriteLine($"F {length}"); return; }
                     else { currNode = currNode.RightSon; continue; }
                 }
                 else if (key < currKey)
                 {
-                    if (currNode.LeftSon == null) { Console.WriteLine($"F: {length}"); return; }
+                    if (currNode.LeftSon == null) { Console.WriteLine($"F {length}"); return; }
                     else { currNode = currNode.LeftSon; continue; }
                 }
 
