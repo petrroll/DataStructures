@@ -68,7 +68,7 @@ namespace SplayTree
             SplayNode parent;
             while((parent = node.Parent) != null)
             {
-#if SIMPLESPLAY
+#if !SIMPLESPLAY
                 if(parent == Root)
 #endif
                 {
