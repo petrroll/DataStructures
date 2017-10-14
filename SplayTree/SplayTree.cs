@@ -1,4 +1,4 @@
-﻿#define SIMPLESPLAY
+﻿//#define SIMPLESPLAY
 
 using System;
 using System.Collections.Generic;
@@ -96,56 +96,122 @@ namespace SplayTree
         private void L(SplayNode node, SplayNode parent)
         {
             var originalParent = parent;
-            ConnectNewParent(node, originalParent);
+            ConnectNewRoot(node, originalParent);
 
-            originalParent.LeftSon = node.RightSon;
-            if (node.RightSon != null) { node.RightSon.Parent = originalParent; }
-
-            originalParent.Parent = node;
-            node.RightSon = originalParent;
+            SetAsLeftSon(originalParent, node.RightSon);
+            SetAsRightSonNN(node, originalParent);
         }
 
         private void R(SplayNode node, SplayNode parent)
         {
             var originalParent = parent;
-            ConnectNewParent(node, originalParent);
+            ConnectNewRoot(node, originalParent);
 
-            originalParent.RightSon = node.LeftSon;
-            if (node.LeftSon != null) { node.LeftSon.Parent = originalParent; }
-
-            originalParent.Parent = node;
-            node.LeftSon = originalParent;
+            SetAsRightSon(originalParent, node.LeftSon);
+            SetAsLeftSonNN(node, originalParent);
 
         }
 
         private void LL(SplayNode node, SplayNode parent, SplayNode grandParent)
         {
+            var B = node.RightSon;
+            var C = parent.RightSon;
+            var D = grandParent.RightSon;
 
+            SetAsLeftSon(parent, B);
+            SetAsLeftSon(grandParent, C);
+            SetAsRightSon(grandParent, D);
+
+            ConnectNewRoot(node, grandParent);
+            SetAsRightSonNN(parent, grandParent);
+            SetAsRightSonNN(node, parent);
         }
 
         private void LR(SplayNode node, SplayNode parent, SplayNode grandParent)
         {
+            var B = node.LeftSon;
+            var C = node.RightSon;
+            var D = grandParent.RightSon;
+
+            SetAsRightSon(parent, B);
+            SetAsLeftSon(grandParent, C);
+            SetAsRightSon(grandParent, D);
+
+            ConnectNewRoot(node, grandParent);
+            SetAsLeftSonNN(node, parent);
+            SetAsRightSonNN(node, grandParent);
 
         }
 
         private void RR(SplayNode node, SplayNode parent, SplayNode grandParent)
         {
+            var B = node.LeftSon;
+            var C = parent.LeftSon;
+            var D = grandParent.LeftSon;
 
+            SetAsRightSon(parent, B);
+            SetAsRightSon(grandParent, C);
+            SetAsRightSon(grandParent, D);
+
+            ConnectNewRoot(node, grandParent);
+            SetAsLeftSonNN(parent, grandParent);
+            SetAsLeftSonNN(node, parent);
         }
 
         private void RL(SplayNode node, SplayNode parent, SplayNode grandParent)
         {
+            var B = node.RightSon;
+            var C = node.LeftSon;
+            var D = grandParent.LeftSon;
 
+            SetAsLeftSon(parent, B);
+            SetAsRightSon(grandParent, C);
+            SetAsLeftSon(grandParent, D);
+
+            ConnectNewRoot(node, grandParent);
+            SetAsRightSonNN(node, parent);
+            SetAsLeftSonNN(node, grandParent);
         }
 
-        private static void ConnectNewParent(SplayNode node, SplayNode originalParent)
+        private static void ConnectNewRoot(SplayNode newRoot, SplayNode originalRoot)
         {
-            node.Parent = originalParent.Parent;
-            if (originalParent.Parent != null)
+            newRoot.Parent = originalRoot.Parent;
+            if (originalRoot.Parent != null)
             {
-                if (originalParent.Parent.LeftSon == originalParent) { originalParent.Parent.LeftSon = node; }
-                else { originalParent.Parent.RightSon = node; }
+                if (originalRoot.Parent.LeftSon == originalRoot) { originalRoot.Parent.LeftSon = newRoot; }
+                else { originalRoot.Parent.RightSon = newRoot; }
             }
+        }
+
+        private static void SetAsLeftSon(SplayNode node, SplayNode newLeftSon)
+        {
+            node.LeftSon = newLeftSon;
+            if(newLeftSon != null)
+            {
+                newLeftSon.Parent = node;
+            }
+        }
+
+        private static void SetAsRightSon(SplayNode node, SplayNode newRightSon)
+        {
+            node.RightSon = newRightSon;
+            if (newRightSon != null)
+            {
+                newRightSon.Parent = node;
+            }
+        }
+
+
+        private static void SetAsLeftSonNN(SplayNode node, SplayNode newLeftSon)
+        {
+            node.LeftSon = newLeftSon;
+            newLeftSon.Parent = node;
+        }
+
+        private static void SetAsRightSonNN(SplayNode node, SplayNode newRightSon)
+        {
+            node.RightSon = newRightSon;
+            newRightSon.Parent = node;  
         }
     }
 
