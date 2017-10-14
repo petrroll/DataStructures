@@ -6,7 +6,7 @@ namespace SplayTree
     {
         static void Main(string[] args)
         {
-            SplayNode splayTree = null;
+            SplayTree splayTree = null;
 
             string line;
             while((line = Console.ReadLine()) != null)
@@ -15,9 +15,8 @@ namespace SplayTree
 
                 switch (command)
                 {
-                    // new tree of size `number`
                     case '#':
-                        splayTree = null;
+                        splayTree = new SplayTree();
                         break;
                     case 'I':
                         splayTree.Insert(number);
