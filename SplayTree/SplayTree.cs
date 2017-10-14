@@ -65,22 +65,37 @@ namespace SplayTree
 
         private void Splay(SplayNode node)
         {
-            while(node.Parent != null)
+            SplayNode parent;
+            while((parent = node.Parent) != null)
             {
 #if SIMPLESPLAY
-                if(node.Parent == Root)
+                if(parent == Root)
 #endif
                 {
-                    if (Root.LeftSon == node) {  L(node); }
-                    else { R(node); }
+                    if (parent.LeftSon == node) {  L(node, parent); }
+                    else { R(node, parent); }
+
+                    continue;
+                }
+
+                var grandParent = parent.Parent;
+                if(grandParent.LeftSon == parent)
+                {
+                    if (parent.LeftSon == node) { LL(node, parent, grandParent); }
+                    else { LR(node, parent, grandParent); }
+                }
+                else
+                {
+                    if (parent.LeftSon == node) { RL(node, parent, grandParent); }
+                    else { RR(node, parent, grandParent); }
                 }
             }
             Root = node;
         }
 
-        private void L(SplayNode node)
+        private void L(SplayNode node, SplayNode parent)
         {
-            var originalParent = node.Parent;
+            var originalParent = parent;
             ConnectNewParent(node, originalParent);
 
             originalParent.LeftSon = node.RightSon;
@@ -90,9 +105,9 @@ namespace SplayTree
             node.RightSon = originalParent;
         }
 
-        private void R(SplayNode node)
+        private void R(SplayNode node, SplayNode parent)
         {
-            var originalParent = node.Parent;
+            var originalParent = parent;
             ConnectNewParent(node, originalParent);
 
             originalParent.RightSon = node.LeftSon;
@@ -100,6 +115,26 @@ namespace SplayTree
 
             originalParent.Parent = node;
             node.LeftSon = originalParent;
+
+        }
+
+        private void LL(SplayNode node, SplayNode parent, SplayNode grandParent)
+        {
+
+        }
+
+        private void LR(SplayNode node, SplayNode parent, SplayNode grandParent)
+        {
+
+        }
+
+        private void RR(SplayNode node, SplayNode parent, SplayNode grandParent)
+        {
+
+        }
+
+        private void RL(SplayNode node, SplayNode parent, SplayNode grandParent)
+        {
 
         }
 
