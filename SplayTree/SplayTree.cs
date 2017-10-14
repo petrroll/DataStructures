@@ -24,12 +24,12 @@ namespace SplayTree
                 if (newKey == currKey) { return; }
                 else if (newKey > currKey)
                 {
-                    if (currNode.RightSon == null) { currNode.RightSon = newNode; return; }
+                    if (currNode.RightSon == null) { currNode.RightSon = newNode; newNode.Parent = currNode; return; }
                     else { currNode = currNode.RightSon; continue; }
                 }
                 else if (newKey < currKey)
                 {
-                    if (currNode.LeftSon == null) { currNode.LeftSon = newNode; return; }
+                    if (currNode.LeftSon == null) { currNode.LeftSon = newNode; newNode.Parent = currNode; return; }
                     else { currNode = currNode.LeftSon; continue; }
                 }
             }
@@ -61,7 +61,7 @@ namespace SplayTree
         }
     }
 
-    [DebuggerDisplay("K:{Key}|L:{LeftSon?.Key}|R:{RightSon?.Key}")]
+    [DebuggerDisplay("K:{Key}|L:{LeftSon?.Key}|R:{RightSon?.Key}|P:{Parent?.Key}")]
     class SplayNode
     {
         public SplayNode(int key)
@@ -73,6 +73,7 @@ namespace SplayTree
 
         public SplayNode LeftSon;
         public SplayNode RightSon;
+        public SplayNode Parent; 
 
     }
 }
