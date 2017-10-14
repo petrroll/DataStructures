@@ -16,6 +16,8 @@ namespace SplayTree
                 switch (command)
                 {
                     case '#':
+                        splayTree = null;
+                        GC.Collect();
                         splayTree = new SplayTree();
                         break;
                     case 'I':
