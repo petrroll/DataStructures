@@ -7,6 +7,7 @@ namespace SplayTree
         static void Main(string[] args)
         {
             SplayTree splayTree = null;
+            Logger logger = new Logger();
 
             string line;
             while((line = Console.ReadLine()) != null)
@@ -16,9 +17,12 @@ namespace SplayTree
                 switch (command)
                 {
                     case '#':
-                        splayTree = null;
+                        splayTree = new SplayTree() { Logger = logger } ;
                         GC.Collect();
-                        splayTree = new SplayTree();
+
+
+                        logger.Flush();
+                        logger.Initialize(number);
                         break;
                     case 'I':
                         splayTree.Insert(number);
@@ -31,6 +35,7 @@ namespace SplayTree
                 }
 
             }
+            logger.Flush();
 
         }
 

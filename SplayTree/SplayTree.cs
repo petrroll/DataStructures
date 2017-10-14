@@ -11,6 +11,7 @@ namespace SplayTree
     class SplayTree
     {
         SplayNode Root { get; set; }
+        public Logger Logger { get; set; }
 
         public void Insert(int key)
         {
@@ -48,15 +49,15 @@ namespace SplayTree
                 length++;
                 int currKey = currNode.Key;
 
-                if (key == currKey) { Console.WriteLine($"S {length}"); Splay(currNode); return; }
+                if (key == currKey) { Logger.AddValue(length); Splay(currNode); return; }
                 else if (key > currKey)
                 {
-                    if (currNode.RightSon == null) { Console.WriteLine($"F {length}"); Splay(currNode); return; }
+                    if (currNode.RightSon == null) { Logger.AddValue(length); Splay(currNode); return; }
                     else { currNode = currNode.RightSon; continue; }
                 }
                 else if (key < currKey)
                 {
-                    if (currNode.LeftSon == null) { Console.WriteLine($"F {length}"); Splay(currNode); return; }
+                    if (currNode.LeftSon == null) { Logger.AddValue(length); Splay(currNode); return; }
                     else { currNode = currNode.LeftSon; continue; }
                 }
 
