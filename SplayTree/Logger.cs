@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace SplayTree
@@ -17,6 +18,7 @@ namespace SplayTree
             Count = 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddValue(int value)
         {
             checked

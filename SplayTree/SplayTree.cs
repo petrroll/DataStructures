@@ -1,8 +1,9 @@
-﻿//#define SIMPLESPLAY
+﻿// #define SIMPLESPLAY
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 
@@ -10,8 +11,8 @@ namespace SplayTree
 {
     class SplayTree
     {
-        SplayNode Root { get; set; }
-        public Logger Logger { get; set; }
+        SplayNode Root;
+        public Logger Logger;
 
         public void Insert(int key)
         {
@@ -28,12 +29,12 @@ namespace SplayTree
                 if (newKey == currKey) { return; }
                 else if (newKey > currKey)
                 {
-                    if (currNode.RightSon == null) { currNode.RightSon = newNode; newNode.Parent = currNode; Splay(currNode); return; }
+                    if (currNode.RightSon == null) { SetAsRightSonNN(currNode, newNode); Splay(currNode); return; }
                     else { currNode = currNode.RightSon; continue; }
                 }
                 else if (newKey < currKey)
                 {
-                    if (currNode.LeftSon == null) { currNode.LeftSon = newNode; newNode.Parent = currNode; Splay(currNode); return; }
+                    if (currNode.LeftSon == null) { SetAsLeftSonNN(currNode, newNode); Splay(currNode); return; }
                     else { currNode = currNode.LeftSon; continue; }
                 }
             }
@@ -82,13 +83,25 @@ namespace SplayTree
                 var grandParent = parent.Parent;
                 if(grandParent.LeftSon == parent)
                 {
-                    if (parent.LeftSon == node) { LL(node, parent, grandParent); }
-                    else { LR(node, parent, grandParent); }
+                    if (parent.LeftSon == node)
+                    {
+                        LL(node, parent, grandParent);
+                    }
+                    else
+                    {
+                        LR(node, parent, grandParent);
+                    }
                 }
                 else
                 {
-                    if (parent.LeftSon == node) { RL(node, parent, grandParent); }
-                    else { RR(node, parent, grandParent); }
+                    if (parent.LeftSon == node)
+                    {
+                        RL(node, parent, grandParent); 
+                    }
+                    else
+                    {
+                        RR(node, parent, grandParent);
+                    }
                 }
             }
             Root = node;
@@ -117,11 +130,9 @@ namespace SplayTree
         {
             var B = node.RightSon;
             var C = parent.RightSon;
-            var D = grandParent.RightSon;
 
             SetAsLeftSon(parent, B);
             SetAsLeftSon(grandParent, C);
-            SetAsRightSon(grandParent, D);
 
             ConnectNewRoot(node, grandParent);
             SetAsRightSonNN(parent, grandParent);
@@ -132,11 +143,9 @@ namespace SplayTree
         {
             var B = node.LeftSon;
             var C = node.RightSon;
-            var D = grandParent.RightSon;
 
             SetAsRightSon(parent, B);
             SetAsLeftSon(grandParent, C);
-            SetAsRightSon(grandParent, D);
 
             ConnectNewRoot(node, grandParent);
             SetAsLeftSonNN(node, parent);
@@ -146,13 +155,11 @@ namespace SplayTree
 
         private void RR(SplayNode node, SplayNode parent, SplayNode grandParent)
         {
-            var B = node.LeftSon;
-            var C = parent.LeftSon;
-            var D = grandParent.LeftSon;
+            var B = parent.LeftSon;
+            var C = node.LeftSon;
 
-            SetAsRightSon(parent, B);
-            SetAsRightSon(grandParent, C);
-            SetAsRightSon(grandParent, D);
+            SetAsRightSon(parent, C);
+            SetAsRightSon(grandParent, B);
 
             ConnectNewRoot(node, grandParent);
             SetAsLeftSonNN(parent, grandParent);
@@ -161,19 +168,18 @@ namespace SplayTree
 
         private void RL(SplayNode node, SplayNode parent, SplayNode grandParent)
         {
-            var B = node.RightSon;
-            var C = node.LeftSon;
-            var D = grandParent.LeftSon;
+            var B = node.LeftSon;
+            var C = node.RightSon;
 
-            SetAsLeftSon(parent, B);
-            SetAsRightSon(grandParent, C);
-            SetAsLeftSon(grandParent, D);
+            SetAsRightSon(grandParent, B);
+            SetAsLeftSon(parent, C);
 
             ConnectNewRoot(node, grandParent);
             SetAsRightSonNN(node, parent);
             SetAsLeftSonNN(node, grandParent);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ConnectNewRoot(SplayNode newRoot, SplayNode originalRoot)
         {
             newRoot.Parent = originalRoot.Parent;
@@ -184,6 +190,7 @@ namespace SplayTree
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetAsLeftSon(SplayNode node, SplayNode newLeftSon)
         {
             node.LeftSon = newLeftSon;
@@ -193,6 +200,7 @@ namespace SplayTree
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetAsRightSon(SplayNode node, SplayNode newRightSon)
         {
             node.RightSon = newRightSon;
@@ -202,13 +210,14 @@ namespace SplayTree
             }
         }
 
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetAsLeftSonNN(SplayNode node, SplayNode newLeftSon)
         {
             node.LeftSon = newLeftSon;
             newLeftSon.Parent = node;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetAsRightSonNN(SplayNode node, SplayNode newRightSon)
         {
             node.RightSon = newRightSon;
