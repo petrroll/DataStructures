@@ -1,26 +1,31 @@
-﻿// #define SIMPLESPLAY
+﻿// Uncomment and recompile to create a version that does single rotations only.
+// #define SIMPLESPLAY
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 
 namespace SplayTree
 {
     class SplayTree
     {
-        SplayNode Root;
-        public Logger Logger;
+        Logger logger;
+        SplayNode root;
+
+        public SplayTree(Logger logger)
+        {
+            this.logger = logger;
+        }
 
         public void Insert(int key)
         {
             var newNode = new SplayNode(key);
 
-            if (Root == null) { Root = newNode; return; }
-            var currNode = Root;
+            if (root == null) { root = newNode; return; }
+            var currNode = root;
 
+            // DFS: insert, and splay the parent of the new node.
             while (true)
             {
                 int currKey = currNode.Key;
@@ -29,12 +34,12 @@ namespace SplayTree
                 if (newKey == currKey) { return; }
                 else if (newKey > currKey)
                 {
-                    if (currNode.RightSon == null) { SetAsRightSonNN(currNode, newNode); Splay(currNode); return; }
+                    if (currNode.RightSon == null) { SetAsRightSonNotNull(currNode, newNode); Splay(currNode); return; }
                     else { currNode = currNode.RightSon; continue; }
                 }
                 else if (newKey < currKey)
                 {
-                    if (currNode.LeftSon == null) { SetAsLeftSonNN(currNode, newNode); Splay(currNode); return; }
+                    if (currNode.LeftSon == null) { SetAsLeftSonNotNull(currNode, newNode); Splay(currNode); return; }
                     else { currNode = currNode.LeftSon; continue; }
                 }
             }
@@ -42,23 +47,26 @@ namespace SplayTree
 
         public void Find(int key)
         {
-            var currNode = Root;
+            if (root == null) { throw new InvalidOperationException("Can't call Find on an empty tree."); }
+
+            var currNode = root;
             int length = -1;
 
+            // DFS: keep the current distance from root, report it to logger once the node is found / not found, splay the last visited node.
             while (true)
             {
                 length++;
                 int currKey = currNode.Key;
 
-                if (key == currKey) { Logger.AddValue(length); Splay(currNode); return; }
+                if (key == currKey) { logger.AddValue(length); Splay(currNode); return; }
                 else if (key > currKey)
                 {
-                    if (currNode.RightSon == null) { Logger.AddValue(length); Splay(currNode); return; }
+                    if (currNode.RightSon == null) { logger.AddValue(length); Splay(currNode); return; }
                     else { currNode = currNode.RightSon; continue; }
                 }
                 else if (key < currKey)
                 {
-                    if (currNode.LeftSon == null) { Logger.AddValue(length); Splay(currNode); return; }
+                    if (currNode.LeftSon == null) { logger.AddValue(length); Splay(currNode); return; }
                     else { currNode = currNode.LeftSon; continue; }
                 }
 
@@ -71,15 +79,16 @@ namespace SplayTree
             while((parent = node.Parent) != null)
             {
 #if !SIMPLESPLAY
-                if(parent == Root)
+                // Use simple rotations only on the topmost level (unless SIMPLESPLAY is set, if it is use them exclusively).
+                if(parent == root)
 #endif
                 {
                     if (parent.LeftSon == node) {  L(node, parent); }
                     else { R(node, parent); }
-
-                    continue;
                 }
 
+#if !SIMPLESPLAY
+                // Double rotations
                 var grandParent = parent.Parent;
                 if(grandParent.LeftSon == parent)
                 {
@@ -104,7 +113,10 @@ namespace SplayTree
                     }
                 }
             }
-            Root = node;
+
+            // 
+            root = node;
+#endif
         }
 
         private void L(SplayNode node, SplayNode parent)
@@ -113,7 +125,7 @@ namespace SplayTree
             ConnectNewRoot(node, originalParent);
 
             SetAsLeftSon(originalParent, node.RightSon);
-            SetAsRightSonNN(node, originalParent);
+            SetAsRightSonNotNull(node, originalParent);
         }
 
         private void R(SplayNode node, SplayNode parent)
@@ -122,7 +134,7 @@ namespace SplayTree
             ConnectNewRoot(node, originalParent);
 
             SetAsRightSon(originalParent, node.LeftSon);
-            SetAsLeftSonNN(node, originalParent);
+            SetAsLeftSonNotNull(node, originalParent);
 
         }
 
@@ -135,8 +147,8 @@ namespace SplayTree
             SetAsLeftSon(grandParent, C);
 
             ConnectNewRoot(node, grandParent);
-            SetAsRightSonNN(parent, grandParent);
-            SetAsRightSonNN(node, parent);
+            SetAsRightSonNotNull(parent, grandParent);
+            SetAsRightSonNotNull(node, parent);
         }
 
         private void LR(SplayNode node, SplayNode parent, SplayNode grandParent)
@@ -148,9 +160,8 @@ namespace SplayTree
             SetAsLeftSon(grandParent, C);
 
             ConnectNewRoot(node, grandParent);
-            SetAsLeftSonNN(node, parent);
-            SetAsRightSonNN(node, grandParent);
-
+            SetAsLeftSonNotNull(node, parent);
+            SetAsRightSonNotNull(node, grandParent);
         }
 
         private void RR(SplayNode node, SplayNode parent, SplayNode grandParent)
@@ -162,8 +173,8 @@ namespace SplayTree
             SetAsRightSon(grandParent, B);
 
             ConnectNewRoot(node, grandParent);
-            SetAsLeftSonNN(parent, grandParent);
-            SetAsLeftSonNN(node, parent);
+            SetAsLeftSonNotNull(parent, grandParent);
+            SetAsLeftSonNotNull(node, parent);
         }
 
         private void RL(SplayNode node, SplayNode parent, SplayNode grandParent)
@@ -175,9 +186,16 @@ namespace SplayTree
             SetAsLeftSon(parent, C);
 
             ConnectNewRoot(node, grandParent);
-            SetAsRightSonNN(node, parent);
-            SetAsLeftSonNN(node, grandParent);
+            SetAsRightSonNotNull(node, parent);
+            SetAsLeftSonNotNull(node, grandParent);
         }
+
+        // Not NotNull helper methods are identical to those above but do not include one (in certain situations redundant) 
+        // null check. While the gain of this is minimal it is on (very) hot path and as such was deemed worth it. 
+
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)] should also not be necessary since JIT is usually clever enough
+        // to inline methods as simple as these. Since they are on a very hot path, however, it's best to hint JIT that we really 
+        // want to inline them.
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ConnectNewRoot(SplayNode newRoot, SplayNode originalRoot)
@@ -211,14 +229,14 @@ namespace SplayTree
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetAsLeftSonNN(SplayNode node, SplayNode newLeftSon)
+        private static void SetAsLeftSonNotNull(SplayNode node, SplayNode newLeftSon)
         {
             node.LeftSon = newLeftSon;
             newLeftSon.Parent = node;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetAsRightSonNN(SplayNode node, SplayNode newRightSon)
+        private static void SetAsRightSonNotNull(SplayNode node, SplayNode newRightSon)
         {
             node.RightSon = newRightSon;
             newRightSon.Parent = node;  

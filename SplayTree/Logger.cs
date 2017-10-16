@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace SplayTree
 {
     class Logger
     {
-        private int TreeSize;
-        private long Sum;
-        private long Count;
+        int treeSize;
+        long sum;
+        long count;
 
         public void Initialize(int newSize)
         {
-            TreeSize = newSize;
-            Sum = 0;
-            Count = 0;
+            treeSize = newSize;
+            sum = 0;
+            count = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -23,16 +21,17 @@ namespace SplayTree
         {
             checked
             {
-                Sum += value;
-                Count++;
+                sum += value;
+                count++;
             }
 
         }
 
         public void Flush()
         {
-            if (Count == 0) { return; }
-            Console.WriteLine($"{TreeSize} {(double)Sum / Count}");
+            if (count == 0) { return; }
+            double averageLength = (double)sum / count;
+            Console.WriteLine($"{treeSize} {averageLength}");
         }
     }
 }

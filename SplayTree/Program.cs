@@ -12,16 +12,17 @@ namespace SplayTree
             string line;
             while((line = Console.ReadLine()) != null)
             {
-                (int number, char command) = ParseNumber(line);
+                (int number, char command) = ParseCommand(line);
 
                 switch (command)
                 {
+                    // Create new SplayTree and report the last one
                     case '#':
-                        splayTree = new SplayTree() { Logger = logger } ;
+                        splayTree = null;
+                        logger.Flush();
                         GC.Collect();
 
-
-                        logger.Flush();
+                        splayTree = new SplayTree(logger);
                         logger.Initialize(number);
                         break;
                     case 'I':
@@ -35,20 +36,23 @@ namespace SplayTree
                 }
 
             }
+            // Report the last tree
             logger.Flush();
 
         }
 
-        private static (int number, char command) ParseNumber(string line)
+        private static (int number, char command) ParseCommand(string line)
         {
+            char command = line[0];
+
             int number = 0;
             for (int i = 2; i < line.Length; i++, number *= 10)
             {
                 number += (line[i] - '0');
             }
-
             number /= 10;
-            return (number, line[0]);
+
+            return (number, command);
         }
     }
 }
