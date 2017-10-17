@@ -246,6 +246,11 @@ namespace SplayTree
     [DebuggerDisplay("K:{Key}|L:{LeftSon?.Key}|R:{RightSon?.Key}|P:{Parent?.Key}")]
     class SplayNode
     {
+
+        // In a real splay tree implementation there the node would be generic and would contain
+        // a generic property "Value" that would get returned in the Find function (that would
+        // return the generic type instead of void).
+
         public SplayNode(int key)
         {
             Key = key;
