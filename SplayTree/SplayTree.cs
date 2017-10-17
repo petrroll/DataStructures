@@ -31,7 +31,7 @@ namespace SplayTree
                 int currKey = currNode.Key;
                 int newKey = newNode.Key;
 
-                if (newKey == currKey) { return; }
+                if (newKey == currKey) { Splay(currNode); return; }
                 else if (newKey > currKey)
                 {
                     if (currNode.RightSon == null) { SetAsRightSonNotNull(currNode, newNode); Splay(currNode); return; }
