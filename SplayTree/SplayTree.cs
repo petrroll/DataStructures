@@ -247,9 +247,11 @@ namespace SplayTree
     class SplayNode
     {
 
-        // In a real splay tree implementation there the node would be generic and would contain
-        // a generic property "Value" that would get returned in the Find function (that would
-        // return the generic type instead of void).
+        // In a real splay tree implementation the node would contain either a generic "Value" property 
+        // or the Key would be a generic T type implementing a IComperable interface so that the tree can
+        // actually serve as more than a fancy benchmark. Either the key or the value property would, then,
+        // get returned in the Find function (that, in this version doesn't return anything but just records
+        // the traveled path to the Logger.
 
         public SplayNode(int key)
         {
