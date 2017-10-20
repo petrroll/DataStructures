@@ -112,11 +112,12 @@ namespace SplayTree
                         RR(node, parent, grandParent);
                     }
                 }
+#endif
+
             }
 
             // 
             root = node;
-#endif
         }
 
         private void L(SplayNode node, SplayNode parent)
