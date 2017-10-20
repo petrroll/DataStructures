@@ -85,6 +85,8 @@ namespace SplayTree
                 {
                     if (parent.LeftSon == node) {  L(node, parent); }
                     else { R(node, parent); }
+
+                    continue;
                 }
 
 #if !SIMPLESPLAY
