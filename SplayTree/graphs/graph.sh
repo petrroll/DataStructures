@@ -53,6 +53,7 @@ set grid\n\
 set title \"$title\"\n\
 set xlabel \"Number of elements in tree\"\n\
 set ylabel \"Average Find path length\"\n\
+set xtics rotate\n\
 plot [:$limit]"
 
 logFileNames=`echo $logFileNames | tr ',' ' '`
