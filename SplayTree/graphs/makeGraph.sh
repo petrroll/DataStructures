@@ -47,7 +47,7 @@ else
 fi
 
 
-plot=${plot}"set term svg solid lw 1\n\
+plot=${plot}"set term pdf solid lw 1\n\
 set output \"$output\"\n\
 set grid\n\
 set title \"$title\"\n\
@@ -70,6 +70,6 @@ plot=`echo $plot | sed 's/.$//'`
 
 plot="$plot \n\
 set output\n\
-set term pop\n"
+set term pdf\n"
 
 echo -e $plot | gnuplot
