@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplayTree", "SplayTree\SplayTree.csproj", "{0BD93959-37B8-4306-A3FA-834066A034F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SplayTree", "SplayTree\SplayTree.csproj", "{0BD93959-37B8-4306-A3FA-834066A034F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiboHeap", "FiboHeap\FiboHeap.csproj", "{1F11151E-753B-4F99-963A-210DB7FAD648}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{0BD93959-37B8-4306-A3FA-834066A034F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BD93959-37B8-4306-A3FA-834066A034F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BD93959-37B8-4306-A3FA-834066A034F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F11151E-753B-4F99-963A-210DB7FAD648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F11151E-753B-4F99-963A-210DB7FAD648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F11151E-753B-4F99-963A-210DB7FAD648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F11151E-753B-4F99-963A-210DB7FAD648}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
