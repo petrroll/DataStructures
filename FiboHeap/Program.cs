@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Diagnostics;
+using FibHeap;
+using System.Linq;
 
 namespace FiboHeap
 {
     class Program
     {
         enum Command { New, INS, DEL, DEC}
+        static FibNode<int>[] NodeIndetifierResolver;
+
         static void Main(string[] args)
         {
-            FiboHeap fibHeap = null;
+            FibHeap<int> fibHeap = null;
             Logger logger = new Logger();
 
             string line;
@@ -19,20 +24,30 @@ namespace FiboHeap
                     // Create new FiboHeap and report the last one
                     case Command.New:
                         fibHeap = null;
+                        NodeIndetifierResolver = null;
+
                         logger.Flush();
                         GC.Collect();
 
-                        fibHeap = new FiboHeap(logger);
+                        NodeIndetifierResolver = new FibNode<int>[2_000_000];
+                        fibHeap = new FibHeap<int>(logger);
                         logger.Initialize(N);
+
+                        Debug.Assert(K == -1);
                         break;
                     case Command.INS:
-                        fibHeap.Insert(N, K);
+                        NodeIndetifierResolver[N] = fibHeap.Insert(N, K);
                         break;
                     case Command.DEL:
-                        fibHeap.Delete();
+                        var identifier = fibHeap.Delete();
+                        Debug.Assert(NodeIndetifierResolver.Min(node => (node != null) ? node.Weight : int.MaxValue) == identifier.Weight);
+                        NodeIndetifierResolver[identifier.Value] = null;
+
+                        Debug.Assert(N == -1 && K == -1);
                         break;
                     case Command.DEC:
-                        fibHeap.Decrease(N, K);
+                        var nodeToDecrease = NodeIndetifierResolver[N];
+                        if (nodeToDecrease != null) { fibHeap.Decrease(nodeToDecrease, K); }
                         break;
                     default:
                         throw new NotImplementedException();
@@ -76,6 +91,7 @@ namespace FiboHeap
                 {
                     result *= 10;
                     result += (input[indexInString] - '0');
+                    indexInInput++;
                 }
 
                 return result;

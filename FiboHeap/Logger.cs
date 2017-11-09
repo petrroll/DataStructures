@@ -6,8 +6,8 @@ namespace FiboHeap
     class Logger
     {
         int treeSize;
-        long sum;
-        long count;
+        ulong sum;
+        ulong count;
 
         public void Initialize(int newSize)
         {
@@ -17,14 +17,22 @@ namespace FiboHeap
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddValue(int value)
+        public void AddValue(uint value)
         {
             checked
             {
                 sum += value;
-                count++;
             }
 
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddNumberOfOperations()
+        {
+            checked
+            {
+                count++;
+            }
         }
 
         public void Flush()
