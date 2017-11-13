@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace FiboHeap
 {
-    class Logger
+    public class Logger
     {
         int treeSize;
         ulong sum;

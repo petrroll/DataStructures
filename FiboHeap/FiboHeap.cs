@@ -6,148 +6,15 @@ using System.Diagnostics;
 
 namespace FibHeap
 {
-    struct CyclicForrest<T>
-    {
-        public bool IsEmpty => (FirstChild == null);
+    // 
+    // The class is full of Debug.Assert some of which are incredibely slow. While I considered deleting them
+    // ... since they don't add anything to the code at first sight they show some invariants I believe should
+    // ... be true about the code and points I considered potentially dangerous for bug creep. Do not run 
+    // ... in DEBUG mode though, it's significantly slower.
+    //
 
-        public FibNode<T> FirstChild;
-        internal uint Rank;
 
-        public CyclicForrest(FibNode<T> firstChild, uint rank)
-        {
-            FirstChild = firstChild;
-            Rank = rank;
-        }
-
-        /// <summary>
-        /// Connects a single FibNode<T> to the current CyclicForrest.
-        /// </summary>
-        internal void AddSingleNode(FibNode<T> newNode) => ConnectToCurrentCyclicList(1, newNode);
-
-        /// <summary>
-        /// Merges another CyclicForrest into the current one.
-        /// </summary>
-        internal void AddChildren(CyclicForrest<T> newChildren) => ConnectToCurrentCyclicList(newChildren.Rank, newChildren.FirstChild);
-        
-        void ConnectToCurrentCyclicList(uint numberOfNewChildren, FibNode<T> newChild)
-        {
-            // If there's nothing new to connect, return.
-            if (newChild == null) { return; }
-
-            Rank += numberOfNewChildren;
-
-            // Current CyclicForrest is empty, set the new one as current FirstChild ref.
-            if (FirstChild == null)
-            {
-                Debug.Assert(Rank == numberOfNewChildren);
-                FirstChild = newChild;
-                return;
-            }
-
-            var current = FirstChild;
-            var preCurrent = current.PreviousSibling;
-
-            var preNewChild = newChild.PreviousSibling;
-
-            // Merge the two cyclic double linked lists.
-            preCurrent.NextSibling = newChild;
-            newChild.PreviousSibling = preCurrent;
-
-            preNewChild.NextSibling = current;
-            current.PreviousSibling = preNewChild;
-
-            Debug.Assert(CheckChildren());     
-        }
-
-        internal void RemoveChild(FibNode<T> nodeBeingRemoved)
-        {
-            Debug.Assert(Rank >= 1);
-            Rank -= 1;
-
-            var preNode = nodeBeingRemoved.PreviousSibling;
-            var posNode = nodeBeingRemoved.NextSibling;
-
-            if (Rank == 0)
-            {
-                // There's only one node, set the FirstChild ref to null.
-                Debug.Assert(posNode == nodeBeingRemoved && preNode == nodeBeingRemoved);
-                FirstChild = null;
-            }
-            else
-            {
-                // Connect the node before and after the one being removed, bypassing the one that is being removed.
-                preNode.NextSibling = posNode;
-                posNode.PreviousSibling = preNode;
-
-                // Update FirstChild pointer in case the item being removed is it. There is definitely another node (see if above) available.
-                if (FirstChild == nodeBeingRemoved)
-                {
-                    FirstChild = posNode;
-                }
-            }
-
-            // Fix the removed node's pointers to siblings and to parent.
-            nodeBeingRemoved.MakeIndividual();
-
-            Debug.Assert(CheckChildren());
-        }
-
-        /// <summary>
-        /// Checks whether the rank is in fact equal to the number of children.
-        /// </summary>
-        /// <remarks>
-        /// It slows computation to crawl. Use only when needed.
-        /// </remarks>
-        internal bool CheckChildren()
-        {
-            if (Rank == 0) { return FirstChild == null; }
-
-            int i = 0;
-            var currTree = FirstChild;
-            do
-            {
-                i++;
-                currTree = currTree.NextSibling;
-            } while (currTree != FirstChild);
-
-            return (i == Rank);
-        }
-    }
-
-    [DebuggerDisplay("V:{Value.ToString()}")]
-    class FibNode<T>
-    {
-        public FibNode<T> Parent;
-        public FibNode<T> PreviousSibling;
-        public FibNode<T> NextSibling;
-
-        public CyclicForrest<T> Children;
-
-        public T Value;
-        public int Weight;
-        internal bool Marked;
-
-        public FibNode(T value, int weight)
-        {
-            Value = value;
-            Weight = weight;
-
-            MakeIndividual();
-        }
-
-        /// <summary>
-        /// Resets node's references to a standalone tree state.
-        /// </summary>
-        internal void MakeIndividual()
-        {
-            Parent = null;
-
-            NextSibling = this;
-            PreviousSibling = this;
-        }
-    }
-
-    class FibHeap<T>
+    public class FibHeap<T>
     {
         CyclicForrest<T> root;
         FibNode<T> currMinimum;
@@ -179,7 +46,9 @@ namespace FibHeap
             Debug.Assert(root.CheckChildren());
             logger.AddNumberOfOperations();
 
-            Debug.Assert(currMinimum != null);
+            Debug.Assert(currMinimum != null || numberOfElements == 0);
+            if(numberOfElements == 0) { return null; }
+
             var minimum = currMinimum;
             currMinimum = null;
 
@@ -253,24 +122,35 @@ namespace FibHeap
                 } while (currTree != root.FirstChild);
             }
 
-            uint newHeapRank = 0;
-            FibNode<T> newHeapRoot = null;
-            FibNode<T> lastNewHeapNode = null;
-            for (int i = 0; i < trees.Length; i++)
+            // Create new heap forrest from the newly created trees with unique ranks
             {
-                FibNode<T> newTree = trees[i];
-                if (newTree == null) { continue; }
+                uint newHeapRank = 0;
+                FibNode<T> newHeapRoot = null;
+                FibNode<T> lastNewHeapNode = null;
 
-                AddTreeToNewHeap(ref newHeapRank, ref newHeapRoot, ref lastNewHeapNode, newTree);
+                for (int i = 0; i < trees.Length; i++)
+                {
+                    FibNode<T> newTree = trees[i];
+                    if (newTree == null) { continue; }
+
+                    AddTreeToNewHeap(ref newHeapRank, ref newHeapRoot, ref lastNewHeapNode, newTree);
+                }
+
+                lastNewHeapNode.NextSibling = newHeapRoot;
+                newHeapRoot.PreviousSibling = lastNewHeapNode;
+
+                root = new CyclicForrest<T>(newHeapRoot, newHeapRank);
             }
-            lastNewHeapNode.NextSibling = newHeapRoot;
-            newHeapRoot.PreviousSibling = lastNewHeapNode;
 
-            root = new CyclicForrest<T>(newHeapRoot, newHeapRank);
             Debug.Assert(root.CheckChildren());
+            
+            //
+            // Below are only local functions. They are not inlined because I believe it's more readable this way since they all
+            // .. represent a standalone functionality. Others might disagree with that assesment, however.
+            //
 
-
-            void AddTreeToNewHeap(ref uint rank, ref FibNode<T> root, ref FibNode<T> lastNode, FibNode<T> tree)
+            // Connects a new tree to a heap forrest that is just being build
+            void AddTreeToNewHeap(ref uint rank, ref FibNode<T> firstNode, ref FibNode<T> lastNode, FibNode<T> tree)
             {
                 rank++;
 
@@ -279,10 +159,7 @@ namespace FibHeap
 
                 UpdateMinimum(tree);
 
-                if (root == null)
-                {
-                    root = tree;
-                }
+                if (firstNode == null) { firstNode = tree; }
                 else
                 {
                     lastNode.NextSibling = tree;
@@ -290,7 +167,6 @@ namespace FibHeap
                 }
 
                 lastNode = tree;
-
             }
 
             // Takes a tree and tries to add it to a rank-indexed tree array. If there is more than 
@@ -329,7 +205,7 @@ namespace FibHeap
                 logger.AddValue(1);
                 
                 // Remove the heavier tree from its original context and add it as a new sibling under the lighter tree.
-                heavierTree.MakeIndividual();
+                heavierTree.ResetSiblingsAndParentToATreeState();
                 heavierTree.Parent = lighterTree;
                 lighterTree.Children.AddSingleNode(heavierTree);
 
@@ -347,4 +223,147 @@ namespace FibHeap
         }
 
     }
+
+    struct CyclicForrest<T>
+    {
+        public bool IsEmpty => (FirstChild == null);
+
+        public FibNode<T> FirstChild;
+        internal uint Rank;
+
+        public CyclicForrest(FibNode<T> firstChild, uint rank)
+        {
+            FirstChild = firstChild;
+            Rank = rank;
+        }
+
+        /// <summary>
+        /// Connects a single FibNode<T> to the current CyclicForrest.
+        /// </summary>
+        internal void AddSingleNode(FibNode<T> newNode) => ConnectToCurrentCyclicList(1, newNode);
+
+        /// <summary>
+        /// Merges another CyclicForrest into the current one.
+        /// </summary>
+        internal void AddChildren(CyclicForrest<T> newChildren) => ConnectToCurrentCyclicList(newChildren.Rank, newChildren.FirstChild);
+
+        void ConnectToCurrentCyclicList(uint numberOfNewChildren, FibNode<T> newChild)
+        {
+            // If there's nothing new to connect, return.
+            if (newChild == null) { return; }
+
+            Rank += numberOfNewChildren;
+
+            // Current CyclicForrest is empty, set the new one as current FirstChild ref.
+            if (FirstChild == null)
+            {
+                Debug.Assert(Rank == numberOfNewChildren);
+                FirstChild = newChild;
+                return;
+            }
+
+            var current = FirstChild;
+            var preCurrent = current.PreviousSibling;
+
+            var preNewChild = newChild.PreviousSibling;
+
+            // Merge the two cyclic double linked lists.
+            preCurrent.NextSibling = newChild;
+            newChild.PreviousSibling = preCurrent;
+
+            preNewChild.NextSibling = current;
+            current.PreviousSibling = preNewChild;
+
+            Debug.Assert(CheckChildren());
+        }
+
+        internal void RemoveChild(FibNode<T> nodeBeingRemoved)
+        {
+            Debug.Assert(Rank >= 1);
+            Rank -= 1;
+
+            var preNode = nodeBeingRemoved.PreviousSibling;
+            var posNode = nodeBeingRemoved.NextSibling;
+
+            if (Rank == 0)
+            {
+                // There's only one node, set the FirstChild ref to null.
+                Debug.Assert(posNode == nodeBeingRemoved && preNode == nodeBeingRemoved);
+                FirstChild = null;
+            }
+            else
+            {
+                // Connect the node before and after the one being removed, bypassing the one that is being removed.
+                preNode.NextSibling = posNode;
+                posNode.PreviousSibling = preNode;
+
+                // Update FirstChild pointer in case the item being removed is it. There is definitely another node (see if above) available.
+                if (FirstChild == nodeBeingRemoved)
+                {
+                    FirstChild = posNode;
+                }
+            }
+
+            // Fix the removed node's pointers to siblings and to parent.
+            nodeBeingRemoved.ResetSiblingsAndParentToATreeState();
+
+            Debug.Assert(CheckChildren());
+        }
+
+        /// <summary>
+        /// Checks whether the rank is in fact equal to the number of children.
+        /// </summary>
+        /// <remarks>
+        /// It slows computation to crawl. Use only when needed.
+        /// </remarks>
+        internal bool CheckChildren()
+        {
+            if (Rank == 0) { return FirstChild == null; }
+
+            int i = 0;
+            var currTree = FirstChild;
+            do
+            {
+                i++;
+                currTree = currTree.NextSibling;
+            } while (currTree != FirstChild);
+
+            return (i == Rank);
+        }
+    }
+
+    [DebuggerDisplay("V:{Value.ToString()}")]
+    public class FibNode<T>
+    {
+        internal FibNode<T> Parent;
+        internal FibNode<T> PreviousSibling;
+        internal FibNode<T> NextSibling;
+
+        internal CyclicForrest<T> Children;
+
+        internal bool Marked;
+
+        public T Value;
+        public int Weight;
+
+        public FibNode(T value, int weight)
+        {
+            Value = value;
+            Weight = weight;
+
+            ResetSiblingsAndParentToATreeState();
+        }
+
+        /// <summary>
+        /// Resets node's references to a standalone tree state.
+        /// </summary>
+        internal void ResetSiblingsAndParentToATreeState()
+        {
+            Parent = null;
+
+            NextSibling = this;
+            PreviousSibling = this;
+        }
+    }
+
 }
