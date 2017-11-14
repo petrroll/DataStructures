@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace FiboHeap
@@ -39,7 +40,7 @@ namespace FiboHeap
         {
             if (count == 0) { return; }
             double averageLength = (double)sum / count;
-            Console.WriteLine($"{treeSize} {averageLength}");
+            Console.WriteLine($"{treeSize} {averageLength.ToString(CultureInfo.GetCultureInfo("en-US"))}");
         }
     }
 }
