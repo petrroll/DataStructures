@@ -1,4 +1,4 @@
-﻿//#define SIMPLE
+﻿// #define SIMPLE
 
 using FiboHeap;
 using System;
@@ -20,6 +20,15 @@ namespace FibHeap
         FibNode<T> currMinimum;
 
         int numberOfElements;
+
+#if !SIMPLE
+        int CurrMaxRank => (int)Math.Ceiling(Math.Log(numberOfElements, 1.6)) + 1;
+#else 
+        // The rank bounds for a simple variant do no longer hold true. While it would be possible to come up with a better solution 
+        // ... the simple variant is for benchmaring only, anyway. And 50 is high enough constant for everything to work just fine. 
+        int CurrMaxRank => 50;
+#endif
+
         Logger logger;
 
         public FibHeap(Logger logger)
@@ -90,12 +99,12 @@ namespace FibHeap
             parent.Children.RemoveChild(payload);
             root.AddSingleNode(payload);
 
-            #if !SIMPLE // If not simple, continue with marking & cuting 
+#if !SIMPLE // If not simple, continue with marking & cuting 
             payload.Marked = false;
 
             if (parent.Marked) { Cut(parent); }
             else if (parent.Parent != null) { parent.Marked = true; }
-            #endif
+#endif
         }
 
         private void Consolidate()
@@ -107,7 +116,7 @@ namespace FibHeap
             }
 
             // The maximum rank is log2(numberOfElements). +1 because the array is 0-based.  
-            var n = (int)Math.Ceiling(Math.Log(numberOfElements, 2)) + 1;
+            var n = CurrMaxRank;
             FibNode<T>[] trees = new FibNode<T>[n];
 
             // Create trees for a new heap forrest from the old heap forrest
@@ -185,7 +194,7 @@ namespace FibHeap
                 else
                 {
                     // Remove the tree the currently processed one will get merged with
-                    treesArray[currRank] = null; 
+                    treesArray[currRank] = null;
 
                     var lighterTree = treeBeingAdded.Weight < otherTree.Weight ? treeBeingAdded : otherTree;
                     var heavierTree = treeBeingAdded.Weight < otherTree.Weight ? otherTree : treeBeingAdded;
@@ -193,6 +202,7 @@ namespace FibHeap
                     FibNode<T> newTree = MergeTrees(lighterTree, heavierTree);
 
                     Debug.Assert(currRank + 1 == newTree.Children.Rank);
+                    Debug.Assert(newTree.Children.Rank <= CurrMaxRank);
                     ProcessTree(treesArray, newTree);
                 }
             }
@@ -209,12 +219,14 @@ namespace FibHeap
                 heavierTree.Parent = lighterTree;
                 lighterTree.Children.AddSingleNode(heavierTree);
 
+                Debug.Assert(lighterTree.Children.Rank <= CurrMaxRank);
+
                 Debug.Assert(lighterTree.Children.CheckChildren());
                 Debug.Assert(!lighterTree.Children.IsEmpty);
 
                 return lighterTree;
             }
-        }
+        }        
 
         void UpdateMinimum (FibNode<T> node)
         {
