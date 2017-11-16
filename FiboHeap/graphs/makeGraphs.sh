@@ -21,7 +21,7 @@
 -title "ExtractMin standardní verze"
 
 ./makeGraph.sh -path "../data" \
--logFileNames "adv.x.out simp.x.out" \
+-logFileNames "simp.x.out adv.x.out" \
 -legendNames "Standardní,Naivní" \
 -output "graph_2.pdf" \
 -title "Standardní vs. naivní verze"
