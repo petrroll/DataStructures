@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SplayTree", "SplayTree\Spla
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FiboHeap", "FiboHeap\FiboHeap.csproj", "{1F11151E-753B-4F99-963A-210DB7FAD648}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTranspos", "MatrixTranspos\MatrixTranspos.csproj", "{68B3D71C-890E-45C6-83F0-C0317631B942}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatrixTranspos", "MatrixTranspos\MatrixTranspos.csproj", "{68B3D71C-890E-45C6-83F0-C0317631B942}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatrixTransposTests", "MatrixTransposTests\MatrixTransposTests.csproj", "{65ACE80B-1E1E-46E0-8886-D436EF51CAA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{68B3D71C-890E-45C6-83F0-C0317631B942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68B3D71C-890E-45C6-83F0-C0317631B942}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68B3D71C-890E-45C6-83F0-C0317631B942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65ACE80B-1E1E-46E0-8886-D436EF51CAA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65ACE80B-1E1E-46E0-8886-D436EF51CAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65ACE80B-1E1E-46E0-8886-D436EF51CAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65ACE80B-1E1E-46E0-8886-D436EF51CAA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

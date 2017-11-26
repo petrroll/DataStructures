@@ -16,7 +16,7 @@ namespace MatrixTranspos
         }
     }
 
-    static class Transpositor3000
+    public static class Transpositor3000
     {
         public static string ToString(int[] matrix, int n)
         {
