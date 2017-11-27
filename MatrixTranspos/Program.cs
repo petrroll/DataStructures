@@ -8,11 +8,6 @@ namespace MatrixTranspos
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            int[] matrix = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-
-            Transpositor3000.Transpose(matrix, 3);
-            Console.WriteLine(Transpositor3000.ToString(matrix, 3));
         }
     }
 
@@ -79,24 +74,35 @@ namespace MatrixTranspos
             }
             else
             {
-                int squareSize = (sizeLonger.h + 1) / 2;
+                int squareSizeLeftUp = (sizeLonger.h + 1) / 2;
+                int squareSizeRightDown = (sizeLonger.w >= squareSizeLeftUp * 2) ? squareSizeLeftUp : (sizeLonger.h - squareSizeLeftUp);
 
-                int rectH = sizeLonger.h - squareSize;
-                int rectW = sizeLonger.w - squareSize;
+                int rectLeftDownH = sizeLonger.h - squareSizeLeftUp;
+                int rectLeftDownW = sizeLonger.w - squareSizeRightDown;
 
+                int rectRightUpH = sizeLonger.h - squareSizeRightDown;
+                int rectRightUpW = sizeLonger.w - squareSizeLeftUp;
 
-                TransposeAndSwitch(matrix, leftUpLonger, leftUpHigher, (squareSize, squareSize), n);
+                TransposeAndSwitch(matrix, leftUpLonger, leftUpHigher, (squareSizeLeftUp, squareSizeLeftUp), n);
 
-                TransposeAndSwitch(matrix, leftUpLonger + squareSize, leftUpHigher + (squareSize * n), (rectW, rectH), n);
-                TransposeAndSwitch(matrix, leftUpLonger + squareSize * n, leftUpHigher + squareSize, (rectW, rectH), n);
+                if (rectRightUpH > rectRightUpW)
+                { TransposeAndSwitch(matrix, leftUpHigher + (squareSizeLeftUp * n), leftUpLonger + squareSizeLeftUp, (rectLeftDownW, rectLeftDownH), n); }
+                else
+                { TransposeAndSwitch(matrix, leftUpLonger + squareSizeLeftUp, leftUpHigher + (squareSizeLeftUp * n), (rectLeftDownW, rectLeftDownH), n); }
 
-                TransposeAndSwitch(matrix, leftUpLonger + squareSize * n + rectW, leftUpHigher + rectW * n + squareSize, (squareSize, squareSize), n);
+                TransposeAndSwitch(matrix, leftUpLonger + squareSizeLeftUp * n, leftUpHigher + squareSizeLeftUp, (rectLeftDownW, rectLeftDownH), n);
+
+                TransposeAndSwitch(matrix, leftUpLonger + rectRightUpH * n + rectLeftDownW, leftUpHigher + rectLeftDownW * n + rectRightUpH, (squareSizeRightDown, squareSizeRightDown), n);
             }
 
             // Recurse to 4 TransposeAndSwitch
 
             void swap(int[] m, int i, int j)
             {
+                Debug.Assert(
+                    i % (int)Math.Sqrt(m.Length) == j / (int)Math.Sqrt(m.Length) &&
+                    j % (int)Math.Sqrt(m.Length) == i / (int)Math.Sqrt(m.Length)
+                    );
                 int tmp = m[i];
 
                 m[i] = m[j];
