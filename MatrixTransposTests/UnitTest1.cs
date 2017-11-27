@@ -1,6 +1,9 @@
 using System;
 using Xunit;
 using MatrixTranspos;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 
 namespace MatrixTransposTests
 {
@@ -66,9 +69,7 @@ namespace MatrixTransposTests
         }
 
         [Theory]
-        [InlineData(17)]
-        [InlineData(34)]
-        [InlineData(64)]
+        [MemberData(nameof(Data))]
         public void Test4(int n)
         {
             int[] matrix = new int[n * n];
@@ -85,5 +86,9 @@ namespace MatrixTransposTests
 
             Assert.Equal(naiveMatrix, naiveMatrix);
         }
+
+        // MemberData accepts one object[] for each test method invocation.
+        public static IEnumerable<object[]> Data
+            => Enumerable.Range(1, 2000).Select(s => new object[] { s });
     }
 }
