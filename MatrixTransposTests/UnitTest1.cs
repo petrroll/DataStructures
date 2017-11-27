@@ -9,7 +9,7 @@ namespace MatrixTransposTests
 {
     public class MatrixTests
     {
-        public static void TransposeNaive(int[] matrix, int n)
+        static void TransposeNaive(int[] matrix, int n)
         {
             for (int i = 0; i < n; i++)
             {
