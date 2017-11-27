@@ -38,7 +38,7 @@ namespace MatrixTransposTests
             Transpositor3000.Transpose(matrix, n);
             TransposeNaive(naiveMatrix, n);
 
-            Assert.Equal(naiveMatrix, naiveMatrix);
+            Assert.Equal(naiveMatrix, matrix);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace MatrixTransposTests
             Transpositor3000.Transpose(matrix, n);
             TransposeNaive(naiveMatrix, n);
 
-            Assert.Equal(naiveMatrix, naiveMatrix);
+            Assert.Equal(naiveMatrix, matrix);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace MatrixTransposTests
             Transpositor3000.Transpose(matrix, n);
             TransposeNaive(naiveMatrix, n);
 
-            Assert.Equal(naiveMatrix, naiveMatrix);
+            Assert.Equal(naiveMatrix, matrix);
         }
 
         [Theory]
@@ -84,11 +84,11 @@ namespace MatrixTransposTests
             Transpositor3000.Transpose(matrix, n);
             TransposeNaive(naiveMatrix, n);
 
-            Assert.Equal(naiveMatrix, naiveMatrix);
+            Assert.Equal(naiveMatrix, matrix);
         }
 
         // MemberData accepts one object[] for each test method invocation.
         public static IEnumerable<object[]> Data
-            => Enumerable.Range(1, 2000).Select(s => new object[] { s });
+            => Enumerable.Range(1, 200).Select(s => new object[] { s });
     }
 }
