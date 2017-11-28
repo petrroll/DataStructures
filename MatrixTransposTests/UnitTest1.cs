@@ -9,24 +9,7 @@ namespace MatrixTransposTests
 {
     public class MatrixTests
     {
-        static void TransposeNaive(int[] matrix, int n)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = i; j < n; j++)
-                {
-                    swap(matrix, i * n + j, j * n + i);
-                }
-            }
 
-            void swap(int[] m, int i, int j)
-            {
-                int tmp = m[i];
-
-                m[i] = m[j];
-                m[j] = tmp;
-            }
-        }
 
         [Fact]
         public void Test1()
@@ -36,7 +19,7 @@ namespace MatrixTransposTests
             var naiveMatrix = (int[])matrix.Clone();
 
             Transpositor3000.Transpose(matrix, n);
-            TransposeNaive(naiveMatrix, n);
+            Transpositor3000.TransposeNaive(naiveMatrix, n);
 
             Assert.Equal(naiveMatrix, matrix);
         }
@@ -49,7 +32,7 @@ namespace MatrixTransposTests
             var naiveMatrix = (int[])matrix.Clone();
 
             Transpositor3000.Transpose(matrix, n);
-            TransposeNaive(naiveMatrix, n);
+            Transpositor3000.TransposeNaive(naiveMatrix, n);
 
             Assert.Equal(naiveMatrix, matrix);
         }
@@ -63,7 +46,7 @@ namespace MatrixTransposTests
             var naiveMatrix = (int[])matrix.Clone();
 
             Transpositor3000.Transpose(matrix, n);
-            TransposeNaive(naiveMatrix, n);
+            Transpositor3000.TransposeNaive(naiveMatrix, n);
 
             Assert.Equal(naiveMatrix, matrix);
         }
@@ -82,7 +65,7 @@ namespace MatrixTransposTests
             var naiveMatrix = (int[])matrix.Clone();
 
             Transpositor3000.Transpose(matrix, n);
-            TransposeNaive(naiveMatrix, n);
+            Transpositor3000.TransposeNaive(naiveMatrix, n);
 
             Assert.Equal(naiveMatrix, matrix);
         }
