@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define SIMULATOR
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -55,8 +56,23 @@ namespace MatrixTranspos
             // Two matrixes 1x1 or 1x2 (and 2x1 respectively) -> swap elements
             if (sizeLonger.h == 1)
             {
+#if SIMULATOR
+                swapSimulator(matrix, n, leftUpLonger, leftUpHigher);
+
+#else
                 swap(matrix, leftUpLonger, leftUpHigher);
-                if (sizeLonger.w == 2) { swap(matrix, leftUpLonger + 1, leftUpHigher + n); }
+
+#endif
+                if (sizeLonger.w == 2)
+                {
+#if SIMULATOR
+                    swapSimulator(matrix, n, leftUpLonger + 1, leftUpHigher + n);
+
+#else
+                    swap(matrix, leftUpLonger + 1, leftUpHigher + n);
+
+#endif
+                }
             }
             else
             {
@@ -93,6 +109,22 @@ namespace MatrixTranspos
 
             m[i] = m[j];
             m[j] = tmp;
+        }
+
+        private static void swapSimulator(int[] m, int n, int i, int j)
+        {
+            Debug.Assert(
+                i % (int)Math.Sqrt(m.Length) == j / (int)Math.Sqrt(m.Length) &&
+                j % (int)Math.Sqrt(m.Length) == i / (int)Math.Sqrt(m.Length)
+            );
+
+            int x = i % n;
+            int y = i / n;
+
+            int l = j % n;
+            int k = j / n;
+
+            Console.WriteLine($"X {x} {y} {l} {k}");
         }
 
         public static string ToString(int[] matrix, int n)
