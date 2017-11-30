@@ -63,7 +63,7 @@ namespace MatrixTransposTests
             }
 
             var naiveMatrix = (int[])matrix.Clone();
-
+        
             Transpositor3000.Transpose(matrix, n);
             Transpositor3000.TransposeNaive(naiveMatrix, n);
 

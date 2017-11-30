@@ -8,7 +8,7 @@ namespace MatrixTranspos
 {
     public static class Transpositor3000
     {
-
+        public const int RecursionEnd = 8;
         public static void TransposeNaive(int[] matrix, int n)
         {
             for (int i = 0; i < n; i++)
@@ -19,6 +19,19 @@ namespace MatrixTranspos
                 }
             }
         }
+
+        public static void TransposeNaive(int[] matrix, int leftUpIndex, int size, int n)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = i; j < size; j++)
+                {
+                    swap(matrix, leftUpIndex + i * n + j, leftUpIndex + j * n + i);
+                }
+            }
+        }
+
+
 
         public static void Transpose(int[] matrix, int n)
         {
@@ -31,72 +44,70 @@ namespace MatrixTranspos
             Debug.Assert(size > 0);
 
             // No need to transpose 1x1 matrix
-            if (size == 1) { return; }
+            if (size <= RecursionEnd) { TransposeNaive(matrix, leftUpIndex, size, n); }
+            else
+            {
 
-            int smallerSquareN = size / 2;
-            int biggerSquareN = size - smallerSquareN;
+                int smallerSquareN = size / 2;
+                int biggerSquareN = size - smallerSquareN;
 
-            int rightDownIndex = leftUpIndex + biggerSquareN * n + biggerSquareN;
+                int rightDownIndex = leftUpIndex + biggerSquareN * n + biggerSquareN;
 
-            Transpose(matrix, leftUpIndex, biggerSquareN, n);
-            Transpose(matrix, rightDownIndex, smallerSquareN, n);
+                Transpose(matrix, leftUpIndex, biggerSquareN, n);
+                Transpose(matrix, rightDownIndex, smallerSquareN, n);
 
-            int rightUpIndex = leftUpIndex + biggerSquareN;
-            int leftDownIndex = leftUpIndex + biggerSquareN * n;
+                int leftDownIndex = leftUpIndex + biggerSquareN * n;
 
-            TransposeAndSwitch(matrix, leftDownIndex, rightUpIndex, (biggerSquareN, smallerSquareN), n);
+                TransposeAndSwitch(matrix, leftDownIndex, (biggerSquareN, smallerSquareN), n);
+            }
+
         }
 
-        private static void TransposeAndSwitch(int[] matrix, int leftUpLonger, int leftUpHigher, (int w, int h) sizeLonger, int n)
+        private static void TransposeAndSwitch(int[] matrix, int leftUpIndex, (int w, int h) size, int n)
         {
-            Debug.Assert(sizeLonger.w >= sizeLonger.h);
-            Debug.Assert(sizeLonger.w - sizeLonger.h <= 1);
-            Debug.Assert(sizeLonger.h > 0);
 
-            // Two matrixes 1x1 or 1x2 (and 2x1 respectively) -> swap elements
-            if (sizeLonger.h == 1)
+            // If matrix <= 8x8 or 9x8 proceed with naive transpose & switch
+            if (size.h <= RecursionEnd)
             {
-#if SIMULATOR
-                swapSimulator(matrix, n, leftUpLonger, leftUpHigher);
+                TransposeAndSwitchNaive(matrix, n, leftUpIndex, size);
+            }
+            else
+            {
+                int hSmaller = (size.h) / 2;
+                int hBigger = size.h - hSmaller;
 
-#else
-                swap(matrix, leftUpLonger, leftUpHigher);
+                int wSmaller = (size.w) / 2;
+                int wBigger = size.w - wSmaller;
 
-#endif
-                if (sizeLonger.w == 2)
+                TransposeAndSwitch(matrix, leftUpIndex, (wBigger, hBigger), n);
+                TransposeAndSwitch(matrix, leftUpIndex + wBigger, (wSmaller, hBigger), n);
+                TransposeAndSwitch(matrix, leftUpIndex + hBigger * n, (wBigger, hSmaller), n);
+                TransposeAndSwitch(matrix, leftUpIndex + hBigger * n + wBigger, (wSmaller, hSmaller), n);
+
+            }
+
+        }
+
+        static void TransposeAndSwitchNaive(int[] matrix, int n, int startIndex, (int w, int h) size)
+        {
+            int secondTileStartIndex = (startIndex % n) * n + (startIndex / n);
+
+            for (int i = 0; i < size.h; i++)
+            {
+                int l = startIndex + i * n;
+                int m = secondTileStartIndex + i;
+
+                for (int j = 0; j < size.w; j++, l++, m += n)
                 {
 #if SIMULATOR
-                    swapSimulator(matrix, n, leftUpLonger + 1, leftUpHigher + n);
+                    swapSimulator(matrix, n, l, m);
 
 #else
-                    swap(matrix, leftUpLonger + 1, leftUpHigher + n);
+                    swap(matrix, l, m);
 
 #endif
                 }
             }
-            else
-            {
-                int squareSizeLeftUp = (sizeLonger.h + 1) / 2;
-                int squareSizeRightDown = (sizeLonger.w >= squareSizeLeftUp * 2) ? squareSizeLeftUp : (sizeLonger.h - squareSizeLeftUp);
-
-                int rectLeftDownH = sizeLonger.h - squareSizeLeftUp;
-                int rectLeftDownW = sizeLonger.w - squareSizeRightDown;
-
-                int rectRightUpH = sizeLonger.h - squareSizeRightDown;
-                int rectRightUpW = sizeLonger.w - squareSizeLeftUp;
-
-                TransposeAndSwitch(matrix, leftUpLonger, leftUpHigher, (squareSizeLeftUp, squareSizeLeftUp), n);
-
-                if (rectRightUpH > rectRightUpW)
-                { TransposeAndSwitch(matrix, leftUpHigher + (squareSizeLeftUp * n), leftUpLonger + squareSizeLeftUp, (rectLeftDownW, rectLeftDownH), n); }
-                else
-                { TransposeAndSwitch(matrix, leftUpLonger + squareSizeLeftUp, leftUpHigher + (squareSizeLeftUp * n), (rectLeftDownW, rectLeftDownH), n); }
-
-                TransposeAndSwitch(matrix, leftUpLonger + squareSizeLeftUp * n, leftUpHigher + squareSizeLeftUp, (rectLeftDownW, rectLeftDownH), n);
-
-                TransposeAndSwitch(matrix, leftUpLonger + rectRightUpH * n + rectLeftDownW, leftUpHigher + rectLeftDownW * n + rectRightUpH, (squareSizeRightDown, squareSizeRightDown), n);
-            }
-
         }
 
         private static void swap(int[] m, int i, int j)

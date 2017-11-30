@@ -1,4 +1,4 @@
-﻿#define NAIVE
+﻿// #define NAIVE
 //#define SIMULATOR
 
 using System;
