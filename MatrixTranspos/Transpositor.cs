@@ -11,17 +11,7 @@ namespace MatrixTranspos
         public const int RecursionEnd = 8;
         public static void TransposeNaive(int[] matrix, int n)
         {
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = i; j < n; j++)
-                {
-#if SIMULATOR
-                    swapSimulator(matrix, n, i * n + j, j * n + i);
-#else
-                    swap(matrix, i * n + j, j * n + i);
-#endif
-                }
-            }
+            TransposeNaive(matrix, 0, n, n);
         }
 
         public static void TransposeNaive(int[] matrix, int leftUpIndex, int size, int n)
@@ -42,6 +32,13 @@ namespace MatrixTranspos
         }
 
 
+        //
+        // All the transponse methods take int[] matrix instead of int[,] matrix. This decision was made early
+        // ..due to an implementation detail of .NET (Core) runtime that has more expensive range checks (that
+        // ..happen for each and every access) for multidimensional arrays. Whether it makes a measurable 
+        // ..difference. Using raw pointers instead of indexes was also considered to mitigate the range checks 
+        // ..overhead entirely but was deemed unnecessary after comparing results with a Cpp implementation. 
+        //
 
         public static void Transpose(int[] matrix, int n)
         {
@@ -53,11 +50,12 @@ namespace MatrixTranspos
         {
             Debug.Assert(size > 0);
 
-            // No need to transpose 1x1 matrix
+            // If matrix < 8x8 -> transpose naively 
             if (size <= RecursionEnd) { TransposeNaive(matrix, leftUpIndex, size, n); }
             else
             {
-
+                // Recurse into: |transpose(biggerSquare)                  |...gets swapped with leftDown rect|   
+                //               |transposeAndSwap(leftDown, biggerSquareN)|transpose(smallerSquare)          |
                 int smallerSquareN = size / 2;
                 int biggerSquareN = size - smallerSquareN;
 
@@ -76,13 +74,17 @@ namespace MatrixTranspos
         private static void TransposeAndSwitch(int[] matrix, int leftUpIndex, (int w, int h) size, int n)
         {
 
-            // If matrix <= 8x8 or 9x8 proceed with naive transpose & switch
+            // If matrix < 8x8 -> transpose and switch naively 
             if (size.h <= RecursionEnd)
             {
                 TransposeAndSwitchNaive(matrix, n, leftUpIndex, size);
             }
             else
             {
+                //                                                    |  A  |  C  |
+                //                                                    |  B  |  D  |
+                // Recurse into 4 transpose and switches  |  A  |  B  |
+                //                                        |  C  |  D  |
                 int hSmaller = (size.h) / 2;
                 int hBigger = size.h - hSmaller;
 
