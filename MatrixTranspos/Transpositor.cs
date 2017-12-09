@@ -1,4 +1,4 @@
-﻿//#define SIMULATOR
+﻿#define SIMULATOR
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +15,11 @@ namespace MatrixTranspos
             {
                 for (int j = i; j < n; j++)
                 {
+#if SIMULATOR
+                    swapSimulator(matrix, n, i * n + j, j * n + i);
+#else
                     swap(matrix, i * n + j, j * n + i);
+#endif
                 }
             }
         }
@@ -26,7 +30,13 @@ namespace MatrixTranspos
             {
                 for (int j = i; j < size; j++)
                 {
+#if SIMULATOR
+                    swapSimulator(matrix, n, leftUpIndex + i * n + j, leftUpIndex + j * n + i);
+#else
                     swap(matrix, leftUpIndex + i * n + j, leftUpIndex + j * n + i);
+#endif
+
+
                 }
             }
         }

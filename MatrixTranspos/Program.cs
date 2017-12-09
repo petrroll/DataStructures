@@ -1,5 +1,5 @@
-﻿// #define NAIVE
-//#define SIMULATOR
+﻿//#define NAIVE
+#define SIMULATOR
 
 using System;
 using System.Diagnostics;
@@ -11,8 +11,9 @@ namespace MatrixTranspos
     {
         static void Main(string[] args)
         {
-            for (int i = 54; i < 140; i++)
+            for (int i = 54; i < 130; i++)
             {
+                Console.Error.WriteLine($"Currently working on: {i}");
                 int n = (int)Math.Ceiling(Math.Pow(2, (i / 9d)));
                 TestMatrixN(n);
             }
