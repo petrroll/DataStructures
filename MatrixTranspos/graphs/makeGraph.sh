@@ -7,9 +7,10 @@ path=$(pwd)
 yrange="[:]"
 color=0
 scale=1
-lw=1
+lw=2
 lwChange=6
 barsEvery=20
+legend="outside right"
 while [ "$1" != "" ]; do
 	case "$1" in
 	-logFileNames)
@@ -44,6 +45,9 @@ while [ "$1" != "" ]; do
 	    shift
 	    color=$1
 	    ;;
+	-legend)
+		shift
+		legend=$1
     esac
     shift
 done
@@ -61,21 +65,23 @@ plot=${plot}"set term pdf size 18cm,12cm solid lw 1\n\
 set output \"$output\"\n\
 set grid\n\
 set title \"$title\"\n\
-set xlabel \"Number of elements in the heap\"\n\
-set ylabel \"Average cost of ExtractMin operation\"\n\
+set xlabel \"N: počet řádků / sloupců matice\"\n\
+set ylabel \"Průměrný čas / počet načtených bloků na jedno prohození\"\n\
 set xtics rotate\n\
-set key outside right\n\
+set key $legend\n\
 plot [:$limit]"
 
 logFileNames=`echo $logFileNames | tr ',' ' '`
 
+i=0
 for logName in $logFileNames ; do
     ((color++))
-    name=`echo $legendNames | cut -d',' -f $color`
+	((i++))
+    name=`echo $legendNames | cut -d',' -f $i`
 
-	if [ "$color" -eq "$lwChange" ]; then
+	if [ "$i" -eq "$lwChange" ]; then
 		color=1
-		lw=3
+		lw=4
 	fi
 
     plot=${plot}"\"${path}/${logName}\" using (\$1/${scale}):2 w l title \"$name\" ls 1 lc $color lw ${lw},"
