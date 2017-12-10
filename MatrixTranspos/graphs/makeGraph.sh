@@ -56,7 +56,7 @@ if [ -z $logScale ]; then
     plot="unset logscale\n"
 	plot=${plot}"set yrange ${yrange}\n"
 else
-    plot="set logscale $logScale\n"
+    plot="set logscale $logScale 2\n"
 fi
 
 plot=${plot}"set xrange [60:]\n"
@@ -66,7 +66,7 @@ set output \"$output\"\n\
 set grid\n\
 set title \"$title\"\n\
 set xlabel \"N: počet řádků / sloupců matice\"\n\
-set ylabel \"Průměrný čas / počet načtených bloků na jedno prohození\"\n\
+set ylabel \"Průměrný čas (ms) / počet načtených bloků na jedno prohození\"\n\
 set xtics rotate\n\
 set key $legend\n\
 plot [:$limit]"
