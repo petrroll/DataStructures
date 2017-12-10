@@ -59,16 +59,33 @@
 	\includegraphics[scale=0.6]{graph_2}		
 	\end{figure}
 
-	Na grafu ze simulátoru jsou 
-
+	Na grafu ze simulátoru je hned na první pohled pozorovatelný jeden fakt. Zatímco cache oblivious algoritmus drží průměrný počet načtených bloků vůči velikosti matice (nebo jejího řádku) konstnatní, tak pro naivní začne vždy od nějakého $n$ průměrný počet načtených bloků růst k číslu okolo $1$. To odpovídá tomu, že jeden ze dvou přístupů swapu (ten co jde ve sloupci) způsobí vždy načtení nového bloku.
+	
+	Naopak pro cache oblivious přístup je zjevná periodicita. Pro $n$ mocniny dvojky je průměrný počet načtených bloků vždy nižší než pro ostatní $n$. To je způsobeno tím, že pro $n$ mocniny dvojky jsou všechny rekurzivní podmatice vždy zarovnané na začátky cache řádků tím nejlepším způsobem, jak jen mohou být.
+	
+	\subsection{Naivní přístup}
+	
 	\begin{figure}[h]	
-    \centering
-		\subfloat{{\includegraphics[scale=0.4]{graph_2_adv}}}%
-		\qquad
-		\subfloat{{\includegraphics[scale=0.4]{graph_2_naive}}}%
-    \end{figure}
+		\centering	
+		\includegraphics[scale=0.6]{graph_2_naive}		
+	\end{figure}
+	
+	Jak bylo řečeno již výše, tak v naivním přístupu pro každou konfiguraci cachí platí následující. Průměrný počet načtených bloků je konstantní až do velikosti, kdy má matice více řádků než kolik má cache bloků, v ten moment začne růst k 1. Zlomová velikost vždy odpovídá tomu, kdy začne mít matice více řádků než kolik je cache bloků. 
+	
+	Jakmile má totiž matice více řádků než je cache bloků, tak naivní přístup z cache vyhodí v rámci přístupů po řádcích kvůli $radku > cacheBloku$ první řádek. A v rámci dalšího průchodu tak první řádek musí znovu načíst. To ale vyhodí druhý řádek, a tak dále. Přístup po řádcích tedy vždy vyústí v načtení jednoho bloku.
+	
+	Tento efekt se nezačne projevovat úplně ostře (zlom není ostrý z malých hodnot rovnou k 1) kvůli tomu, že počet efektivních řádků z pohledu algoritmu se lineárně mění z 1 do $n$. U přístupů v rámci řádků totiž jedeme v horním trojúhelníku (nad diagonálou) a u přístupů po řádcích v dolním trojúhelníku (pod diagonálou). Díky tomu po zlomu roste průměrný počet načtených bloků postupně (v relaci k tomu jakou část běhu algoritmu je počet řádků větší než počet bloků cache). Čím je počet bloků větší tím postupnější je tento přechod.
+
+	Pro přístupy v rámci řádku (v naivním algoritmu je vždy jedne po řádcích a jeden v rámci řádku) se pak s $n$ nic nemění. Konfigurace cache jen ovlivňuje, jaký je průměrný počet načtených bloků na jeden přístup. Různost těchto čísel pro různé konfigurace způsobuje, proč po zlomovém bodě nekonvergují všechny průměrné počty přístupů k jendomu číslu, ale proč jdou konfigurace s delšími cache bloky k $1$ a ty s kratšími jdou k hodnotě $> 1$. Konkrétně pro cache bloky o 64B k $1 + 1/(64 / 4) = 1.062$
+		
+	Co se týče průběhu před zlomem, tak tam se výše popsaný průměrný počet bloků na přístup v rámci řádku projevuje také, což vysvětluje různé výšky ze začátku. Například pro konfiguraci 64x1024 a 64x4096 je to $2 * 1.062 = 0.124$. Načtení nového bloku je totiž třeba každých $64 / 4$ bloků pro přístupy v rámci řádku a to samé v rámci sloupců (každých $64 / 4$ sloupců je potřeba načíst pro každý prvek ve sloupci, pro zbylé sloupce se jede z již načtených bloků). Obdobně pro ostatní konfigurace.
 
 
-
+	\subsection{Cache oblivious přístup}
+	
+		\begin{figure}[h]	
+		\centering	
+		\includegraphics[scale=0.6]{graph_2_adv}		
+	\end{figure}
 
 \end{document}
