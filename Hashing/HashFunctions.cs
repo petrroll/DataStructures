@@ -3,8 +3,13 @@ using System.Diagnostics;
 
 namespace Hashing
 {
+    public interface IHashFunction
+    {
+        ulong Hash(ulong input);
+        void Reset();
+    }
 
-    class MultiShiftHash
+    public sealed class MultiShiftHash : IHashFunction
     {
         Random rnd = new Random();
 
@@ -36,7 +41,7 @@ namespace Hashing
         }
     }
 
-    class NaiveModuloHash
+    public sealed class NaiveModuloHash : IHashFunction
     {
         private readonly int mSizeBits;
         private ulong mask = 0;
@@ -56,9 +61,11 @@ namespace Hashing
 
             return result;
         }
+
+        public void Reset(){}
     }
 
-    class TableHash
+    public sealed class TableHash : IHashFunction
     {
         Random rnd = new Random();
 
@@ -93,9 +100,7 @@ namespace Hashing
 
             for (int i = 1; i < tables.Length; i++)
             {
-                Debug.Assert(mask <= int.MaxValue);
-
-                mask = mask << tableIndexSizeBits;
+                input = input >> tableIndexSizeBits; 
                 index = (int)(input & mask);
 
                 Debug.Assert((ulong)index < (1ul << tableIndexSizeBits));
@@ -107,9 +112,8 @@ namespace Hashing
             return result;
         }
 
-        private void Reset()
+        public void Reset()
         {
-
             for (int i = 0; i < tables.Length; i++)
             {
                 for (int j = 0; j < tables[i].Length; j++)
@@ -118,7 +122,6 @@ namespace Hashing
 
                 }
             }
-            throw new NotImplementedException();
         }
     }
 

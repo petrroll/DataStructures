@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SplayTree", "SplayTree\SplayTree.csproj", "{0BD93959-37B8-4306-A3FA-834066A034F9}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatrixTranspos", "MatrixTra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatrixTransposTests", "MatrixTransposTests\MatrixTransposTests.csproj", "{65ACE80B-1E1E-46E0-8886-D436EF51CAA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hashing", "Hashing\Hashing.csproj", "{7C7C1C96-549E-455B-ADB6-6D690CC8B6CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hashing", "Hashing\Hashing.csproj", "{7C7C1C96-549E-455B-ADB6-6D690CC8B6CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashingTests", "HashingTests\HashingTests.csproj", "{80FB9B33-545B-44C2-8343-2C12F358C5F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{7C7C1C96-549E-455B-ADB6-6D690CC8B6CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C7C1C96-549E-455B-ADB6-6D690CC8B6CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C7C1C96-549E-455B-ADB6-6D690CC8B6CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80FB9B33-545B-44C2-8343-2C12F358C5F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80FB9B33-545B-44C2-8343-2C12F358C5F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80FB9B33-545B-44C2-8343-2C12F358C5F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80FB9B33-545B-44C2-8343-2C12F358C5F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
