@@ -83,9 +83,23 @@
 
 	\subsection{Cache oblivious přístup}
 	
-		\begin{figure}[h]	
+	\begin{figure}[h]	
 		\centering	
 		\includegraphics[scale=0.6]{graph_2_adv}		
 	\end{figure}
+	
+	Předně, pro všechny konfigurace platí, že dokud se celá matice vejde do cache, tak je průměrný počet bloků víceméně konstantní. Nepřekvapivě odpovídající přibližně $1\over(velikostCache/4)$. 
+	
+	Jakmile je tento počet překročen tak začne průměrný počet bloků stoupat. Pro konfigurace, které mají cache bloky v tomto bodě menší než $n$ (první tři), přejde do periodického  stavu, který odpovídá ideálnímu chování z přednášky. Tedy takovému, kdy se matice rekurzí rozdělí na právě takové podmatice, aby se právě vešly do cache. 
+	
+	Zde je také krásně pozorovatelné, že pro mocniny se tento periodický stav přibliží - v průměrném počtu načtených bloků - ideálnímu stavu, kdy se celá matice vešla do cache. Všechny rekurzivní podmatice jsou totiž při $n = 2^k$ dokonale zarovnané, jednotlivé cache bloky pro rekurzivní volání se tedy nepřekrývají a situace je ideální.
+	
+	Pro $n != 2^k$ je pak vždy pozorovatelný horší průměrný počet načtených bloků. Čím je cache méně, tj. do čím menších podmatic se rekurze musí dostat než se vše vejde do cache, tím jsou hodnoty pro nemocniny dvojky horší. Tím větší podíl totiž mají ony okrajové bloky, které se překrývají s okolními rekurzivními podmaticemi kvůli nedokonalému zarovnání adres, a které tedy musí být načtené vicekrát.
+	
+	Další jev, který si zaslouží zmínit je pozvolný nástup pro konfiguraci 4096x64 a do menší míry i 512x512. Ten je způsoben tím, že pro menší $n$ je řádek matice kratší než blok cache, jeden přístup tedy způsobí načtení hned několika řádků.
+	
+	Poslední úkaz, který si zaslouží zmínit je relativní velikost čísel pro jednotlivé konfigurace. Zatímco první tři konfigurace mají výrazně rozdílné absolutní velikosti cache tak sdílí base-line úroveň pro ideální využítí cache (u $n == 2^k$). To je způsobeno tím, že kvůli tomu, že mají stejně velký cache blok, tak i v ideálním případě musí každých $64$-čtení dojít k načtení nového bloku.
+	
+	Naopak s větším cache blokem, i když celková velikost cache není větší, může být počet čtení teoreticky výrazně menší. Jediné místo, kde by to nemusela být pravda je konfigurace 4096x64 neb u ní není zaručeno, že si řádek nevyhodíme (výrazně) dřív než budeme moci jeho zbytek použít. To je také důvodem, proč je tato konfigurace horší než 512x512. Díky tomu, jak jsem implementoval metodu `TransposeAndSwitch` jde ovšem rekurze po podmaticích vedle sebe a je tedy schopná efektivně pracovat na dvou podmaticích 32x32 vedle sebe v cache než si načtené bloky vyhodí. To je důvod, proč je lepší než konfigurace 64xYY, které jsou schopné efektivně pracovat jen s aktuální jednou podmaticí 32x32 v cache.
 
 \end{document}
