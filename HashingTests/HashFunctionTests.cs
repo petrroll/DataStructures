@@ -16,7 +16,7 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                myHashTable.Add(i, i);
+                myHashTable.Add(i + 1, i + 1);
                 myHashTable.Add(otherI, otherI);
             }
 
@@ -24,7 +24,7 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                Assert.Equal(i, myHashTable.Find(i));
+                Assert.Equal(i + 1, myHashTable.Find(i + 1));
                 Assert.Equal(otherI, myHashTable.Find(otherI));
             }
         }
@@ -38,7 +38,7 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                myHashTable.Add(i, i);
+                myHashTable.Add(i + 1, i + 1);
                 myHashTable.Add(otherI, otherI);
             }
 
@@ -46,7 +46,7 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                Assert.Equal(i, myHashTable.Find(i));
+                Assert.Equal(i + 1, myHashTable.Find(i + 1));
                 Assert.Equal(otherI, myHashTable.Find(otherI));
             }
         }
@@ -60,7 +60,7 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                myHashTable.Add(i, i);
+                myHashTable.Add(i + 1, i + 1);
                 myHashTable.Add(otherI, otherI);
             }
 
@@ -68,7 +68,7 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                Assert.Equal(i, myHashTable.Find(i));
+                Assert.Equal(i + 1, myHashTable.Find(i + 1));
                 Assert.Equal(otherI, myHashTable.Find(otherI));
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Hashing
@@ -22,6 +23,9 @@ namespace Hashing
 
         public void Add(ulong key, T value)
         {
+            // Do not allow inserting default(T) values
+            Debug.Assert(!comparer.Equals(value, default(T)));
+
             ulong index = hashFunction.Hash(key);
             while(!comparer.Equals(dataStore[index].Value, default(T)))
             {
