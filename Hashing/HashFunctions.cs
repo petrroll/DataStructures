@@ -64,35 +64,42 @@ namespace Hashing
 
         private readonly int mSizeBits;
         private readonly int tableIndexSizeBits;
-        private readonly ulong[] table;
+        private readonly ulong[][] tables;
 
         public TableHash(int mSizeBits, int tableSizeBits)
         {
             this.tableIndexSizeBits = tableSizeBits;
             this.mSizeBits = mSizeBits;
 
-            table = new ulong[1 << tableSizeBits];
+            // Number of tables is celing(UniversumBits / TableSize)
+            int numberOfTables = (64 / tableSizeBits) + (64 % tableSizeBits == 0 ? 0 : 1);
+            tables = new ulong[numberOfTables][];
+
+            for (int i = 0; i < numberOfTables; i++)
+            {
+                tables[i] = new ulong[1 << tableSizeBits];
+            }
 
             Reset();
         }
 
         public ulong Hash(ulong input)
         {
-            int numberOfSegments = 64 / tableIndexSizeBits;
             ulong mask = (ulong)(1 << tableIndexSizeBits) - 1;
-
             Debug.Assert(mask <= int.MaxValue);
 
             int index = (int)(input & mask);
-            ulong result = table[index];
+            ulong result = tables[0][index];
 
-            // xors with one more segments (full of 0) when (64 % tableIndexSizebits == 0), otherwise the one plus handles incomplete segment
-            for (int i = 0; i < numberOfSegments; i++)
+            for (int i = 1; i < tables.Length; i++)
             {
+                Debug.Assert(mask <= int.MaxValue);
+
                 mask = mask << tableIndexSizeBits;
                 index = (int)(input & mask);
 
-                result = result ^ table[index];
+                Debug.Assert((ulong)index < (1ul << tableIndexSizeBits));
+                result = result ^ tables[i][index];
             }
 
             Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
@@ -102,9 +109,14 @@ namespace Hashing
 
         private void Reset()
         {
-            for (int i = 0; i < table.Length; i++)
+
+            for (int i = 0; i < tables.Length; i++)
             {
-                table[i] = (ulong)rnd.Next(1 << mSizeBits);
+                for (int j = 0; j < tables[i].Length; j++)
+                {
+                    tables[i][j] = (ulong)rnd.Next(1 << mSizeBits);
+
+                }
             }
             throw new NotImplementedException();
         }
