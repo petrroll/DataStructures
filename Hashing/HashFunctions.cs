@@ -28,13 +28,14 @@ namespace Hashing
 
         public ulong Hash(ulong input)
         {
-            // No need to do modulo |U| as our universe it of the same size as our data type          
+            // No need to do modulo |U| as our universe it of the same size as our data type (64bit)         
             ulong result = (a * input) >> numberOfForgottenBits;
-            Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
 
+            Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
             return result;
         }
 
+        // Select a random multiplication constant from the universum.
         public void Reset()
         {
             a = rnd.NextULong();
@@ -56,9 +57,10 @@ namespace Hashing
 
         public ulong Hash(ulong input)
         {
+            // since mSize is 2^k the modulo op is taking mSizeBits lower bits of the input
             ulong result = input & mask;
-            Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
 
+            Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
             return result;
         }
 
@@ -73,6 +75,8 @@ namespace Hashing
         private readonly int tableIndexSizeBits;
         private readonly ulong[][] tables;
 
+        ulong mask;
+
         public TableHash(int mSizeBits, int tableSizeBits)
         {
             this.tableIndexSizeBits = tableSizeBits;
@@ -80,46 +84,46 @@ namespace Hashing
 
             // Number of tables is celing(UniversumBits / TableSize)
             int numberOfTables = (64 / tableSizeBits) + (64 % tableSizeBits == 0 ? 0 : 1);
-            tables = new ulong[numberOfTables][];
 
+            // allocate all tables in the beginning
+            tables = new ulong[numberOfTables][];
             for (int i = 0; i < numberOfTables; i++)
             {
                 tables[i] = new ulong[1 << tableSizeBits];
             }
 
+            mask = (ulong)(1 << tableIndexSizeBits) - 1;
             Reset();
         }
 
         public ulong Hash(ulong input)
         {
-            ulong mask = (ulong)(1 << tableIndexSizeBits) - 1;
             Debug.Assert(mask <= int.MaxValue);
 
-            int index = (int)(input & mask);
-            ulong result = tables[0][index];
-
-            for (int i = 1; i < tables.Length; i++)
-            {
-                input = input >> tableIndexSizeBits; 
-                index = (int)(input & mask);
+            ulong result = 0;
+            for (int i = 0; i < tables.Length; i++)
+            { 
+                int index = (int)(input & mask);
 
                 Debug.Assert((ulong)index < (1ul << tableIndexSizeBits));
                 result = result ^ tables[i][index];
+
+                // shift the bits we used for the last table away
+                input = input >> tableIndexSizeBits;
             }
 
             Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
-
             return result;
         }
 
         public void Reset()
         {
+            // Assign the tables with random values.
             for (int i = 0; i < tables.Length; i++)
             {
                 for (int j = 0; j < tables[i].Length; j++)
                 {
                     tables[i][j] = (ulong)rnd.Next(1 << mSizeBits);
-
                 }
             }
         }
