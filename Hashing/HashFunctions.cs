@@ -5,7 +5,7 @@ namespace Hashing
 {
     public interface IHashFunction
     {
-        ulong Hash(ulong input);
+        int Hash(ulong input);
         void Reset();
     }
 
@@ -26,13 +26,13 @@ namespace Hashing
         }
 
 
-        public ulong Hash(ulong input)
+        public int Hash(ulong input)
         {
             // No need to do modulo |U| as our universe it of the same size as our data type (64bit)         
             ulong result = (a * input) >> numberOfForgottenBits;
 
             Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
-            return result;
+            return (int)result;
         }
 
         // Select a random multiplication constant from the universum.
@@ -55,13 +55,13 @@ namespace Hashing
             this.mask = (ulong)((1 << mSizeBits) - 1);
         }
 
-        public ulong Hash(ulong input)
+        public int Hash(ulong input)
         {
             // since mSize is 2^k the modulo op is taking mSizeBits lower bits of the input
             ulong result = input & mask;
 
             Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
-            return result;
+            return (int)result;
         }
 
         public void Reset(){}
@@ -96,7 +96,7 @@ namespace Hashing
             Reset();
         }
 
-        public ulong Hash(ulong input)
+        public int Hash(ulong input)
         {
             Debug.Assert(mask <= int.MaxValue);
 
@@ -113,7 +113,7 @@ namespace Hashing
             }
 
             Debug.Assert(result < (1ul << mSizeBits)); // Assume mSizeBits < 64, otherwise this assert will fire everytime
-            return result;
+            return (int)result;
         }
 
         public void Reset()

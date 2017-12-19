@@ -5,20 +5,31 @@ using System.Text;
 
 namespace Hashing
 {
-    public class LinearHashTable<T> where T : IEquatable<T>
+    public abstract class HashTable<T>
+    {
+        protected EqualityComparer<T> comparer;
+        protected KeyValuePair<ulong, T>[] dataStore;
+
+        public HashTable(int logOfCapacity)
+        {
+            dataStore = new KeyValuePair<ulong, T>[1 << logOfCapacity];
+            comparer = EqualityComparer<T>.Default;
+        }
+
+        protected bool IsEmpty(int index)
+        {
+            return comparer.Equals(dataStore[index].Value, default(T));
+        }
+    }
+
+    public sealed class LinearHashTable<T> : HashTable<T> where T : IEquatable<T>
     {
         IHashFunction hashFunction;
-        KeyValuePair<ulong, T>[] dataStore;
-
-        EqualityComparer<T> comparer;
-
 
         public LinearHashTable(int logOfCapacity, IHashFunction hash)
+            : base(logOfCapacity)
         {
             hashFunction = hash;
-            dataStore = new KeyValuePair<ulong, T>[1 << logOfCapacity];
-
-            comparer = EqualityComparer<T>.Default;
         }
 
         public void Add(ulong key, T value)
@@ -26,11 +37,11 @@ namespace Hashing
             // Do not allow inserting default(T) values
             Debug.Assert(!comparer.Equals(value, default(T)));
 
-            ulong index = hashFunction.Hash(key);
-            while(!comparer.Equals(dataStore[index].Value, default(T)))
+            int index = hashFunction.Hash(key);
+            while(!IsEmpty(index))
             {
                 index++;
-                if (index >= (ulong)dataStore.Length) { index = 0; }
+                if (index >= dataStore.Length) { index = 0; }
             }
 
             dataStore[index] = new KeyValuePair<ulong, T>(key, value);
@@ -38,16 +49,45 @@ namespace Hashing
 
         public T Find(ulong key)
         {
-            ulong index = hashFunction.Hash(key);
+            int index = hashFunction.Hash(key);
 
             while (dataStore[index].Key != key)
             {
-                if(comparer.Equals(dataStore[index].Value, default(T))) { return default(T); }
+                if (IsEmpty(index)) { return default(T); }
                 index++;
-                if (index >= (ulong)dataStore.Length) { index = 0; }
+                if (index >= dataStore.Length) { index = 0; }
             }
 
             return dataStore[index].Value;
+        }
+    }
+
+    public sealed class CuckooHashTable<T> : HashTable<T>
+    {
+        IHashFunction functionA;
+        IHashFunction functionB;
+
+        public CuckooHashTable(int logOfCapacity, IHashFunction functionA, IHashFunction functionB)
+            :base(logOfCapacity)
+        {
+            this.functionA = functionA;
+            this.functionB = functionB;
+        }
+
+        public void Add(ulong key, T value)
+        {
+            // Do not allow inserting default(T) values
+            Debug.Assert(!comparer.Equals(value, default(T)));
+
+            int hashA = functionA.Hash(key);
+            if (IsEmpty(hashA)) { dataStore[hashA] = new KeyValuePair<ulong, T>(key, value); return; }
+
+            int hashB = functionB.Hash(key);
+        }
+
+        public T Find(ulong key)
+        {
+            return default(T);
         }
     }
 }
