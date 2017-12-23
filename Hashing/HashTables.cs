@@ -9,7 +9,7 @@ namespace Hashing
     public interface IHashTable<TValue, TKey>
     {
         void Add(TKey key, TValue value);
-        TValue Find(TKey key);
+        (bool found, TValue value) Find(TKey key);
 
     }
     public abstract class HashTable<TValue, TKey>
@@ -24,7 +24,7 @@ namespace Hashing
         }
     }
 
-    public sealed class LinearHashTable<T> : HashTable<T, ulong>, IHashTable<T, ulong> where T : IEquatable<T>
+    public sealed class LinearHashTable<T> : HashTable<T, (bool Occupied, ulong Key)>, IHashTable<T, ulong> where T : IEquatable<T>
     {
         IHashFunction hashFunction;
 
@@ -36,9 +36,6 @@ namespace Hashing
 
         public void Add(ulong key, T value)
         {
-            // Do not allow inserting default(T) values
-            Debug.Assert(!comparer.Equals(value, default(T)));
-
             int index = hashFunction.Hash(key);
             while(!IsEmpty(index))
             {
@@ -46,26 +43,26 @@ namespace Hashing
                 if (index >= dataStore.Length) { index = 0; }
             }
 
-            dataStore[index] = new KeyValuePair<ulong, T>(key, value);
+            dataStore[index] = new KeyValuePair<(bool, ulong), T>((true, key), value);
         }
 
-        public T Find(ulong key)
+        public (bool found, T value) Find(ulong key)
         {
             int index = hashFunction.Hash(key);
 
-            while (dataStore[index].Key != key)
+            while (dataStore[index].Key.Key != key)
             {
-                if (IsEmpty(index)) { return default(T); }
+                if (IsEmpty(index)) { return (false, default(T)); }
                 index++;
                 if (index >= dataStore.Length) { index = 0; }
             }
 
-            return dataStore[index].Value;
+            return (true, dataStore[index].Value);
         }
 
-        protected bool IsEmpty(int index)
+        bool IsEmpty(int index)
         {
-            return comparer.Equals(dataStore[index].Value, default(T));
+            return !dataStore[index].Key.Occupied;
         }
     }
 
@@ -200,15 +197,15 @@ namespace Hashing
             return (dataStorePackage.Key.type == HashedWith.Empty);
         }
 
-        public T Find(ulong key)
+        public (bool found, T value) Find(ulong key)
         {
             var hashA = functionA.Hash(key);
-            if(dataStore[hashA].Key.key == key && dataStore[hashA].Key.type != HashedWith.Empty) { return dataStore[hashA].Value; }
+            if(dataStore[hashA].Key.key == key && dataStore[hashA].Key.type != HashedWith.Empty) { return (true, dataStore[hashA].Value); }
 
             var hashB = functionB.Hash(key);
-            if (dataStore[hashB].Key.key == key && dataStore[hashB].Key.type != HashedWith.Empty) { return dataStore[hashB].Value; }
+            if (dataStore[hashB].Key.key == key && dataStore[hashB].Key.type != HashedWith.Empty) { return (true, dataStore[hashB].Value); }
 
-            return default(T);
+            return (false, default(T));
         }
     }
 }

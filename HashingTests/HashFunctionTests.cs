@@ -48,16 +48,29 @@ namespace HashingTests
             {
                 ulong otherI = (ulong)ulong.MaxValue - i;
 
-                myHashTable.Add(i + 1, i + 1);
+                myHashTable.Add(i, i);
                 myHashTable.Add(otherI, otherI);
             }
 
             for (ulong i = 0; i < numberOfElements; i++)
             {
-                ulong otherI = (ulong)ulong.MaxValue - i;
 
-                Assert.Equal(i + 1, myHashTable.Find(i + 1));
-                Assert.Equal(otherI, myHashTable.Find(otherI));
+                var resultI = myHashTable.Find(i);
+
+                Assert.True(resultI.found);
+                Assert.Equal(resultI.value, i);
+
+                ulong otherI = (ulong)ulong.MaxValue - i;
+                var resultOtherI = myHashTable.Find(otherI);
+
+                Assert.True(resultOtherI.found);
+                Assert.Equal(resultOtherI.value, otherI);
+            }
+
+            for (ulong i = numberOfElements; i < 2*numberOfElements; i++)
+            {
+                var result = myHashTable.Find(i);
+                Assert.False(result.found);
             }
         }
     }
