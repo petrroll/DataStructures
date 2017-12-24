@@ -10,11 +10,12 @@ namespace Hashing
     public interface IHashTable<TValue, TKey>
     {
 #if LOGGER
-        StepsLogger Logger { get; set; }
+        StepsCounter Logger { get; set; }
 #endif
         void Add(TKey key, TValue value);
         (bool found, TValue value) Find(TKey key);
 
+        void Reset();
     }
 
     public abstract class HashTable<TValue, TKey>
@@ -40,7 +41,7 @@ namespace Hashing
         IHashFunction hashFunction;
 
 #if LOGGER
-        public StepsLogger Logger { get; set; }
+        public StepsCounter Logger { get; set; }
 #endif
 
         public LinearHashTable(int logOfCapacity, IHashFunction hash)
@@ -99,7 +100,7 @@ namespace Hashing
     public sealed class CuckooHashTable<T> : HashTable<T, (ulong key, HashedWith type)>, IHashTable<T, ulong>
     {
 #if LOGGER
-        public StepsLogger Logger { get; set; }
+        public StepsCounter Logger { get; set; }
 #endif
 
         IHashFunction functionA;

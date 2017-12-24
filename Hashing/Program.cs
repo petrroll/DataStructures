@@ -11,13 +11,69 @@ namespace Hashing
 
         static void Main(string[] args)
         {
+            //firstAssigment();
+            secondAssigment();
+        }
 
+        private static void firstAssigment()
+        {
             int hashTableSizeBits = 24;
             ulong[] randNumbers = initRandomNumbers(hashTableSizeBits);
 
             testSteps(hashTableSizeBits, randNumbers);
             testTime(hashTableSizeBits, randNumbers);
+        }
 
+        private static void secondAssigment()
+        {
+            AdvancedStepsLogger stepsLogger = new AdvancedStepsLogger();
+
+            Func<int, IHashTable<bool, ulong>> linMultishiftCreator = (int tableSizeInBits) => new LinearHashTable<bool>(tableSizeInBits, new MultiShiftHash(tableSizeInBits));
+            Func<int, IHashTable<bool, ulong>> linTableCrator = (int tableSizeInBits) => new LinearHashTable<bool>(tableSizeInBits, new TableHash(tableSizeInBits, 16));
+
+            Console.WriteLine($"Started linTable");
+            statisticallyTestOneHashConfig(stepsLogger, linTableCrator, "linTable");
+
+            Console.WriteLine($"Started limMultiShift");
+            statisticallyTestOneHashConfig(stepsLogger, linMultishiftCreator, "linMultishift");
+
+        }
+
+        private static void statisticallyTestOneHashConfig(AdvancedStepsLogger stepsLogger, Func<int, IHashTable<bool, ulong>> hashTableCreator, string name)
+        {
+            using (stepsLogger.wrMin = new StreamWriter($"data/min_{name}.out"))
+            using (stepsLogger.wrMax = new StreamWriter($"data/max_{name}.out"))
+            using (stepsLogger.wrAvg = new StreamWriter($"data/avg_{name}.out"))
+            using (stepsLogger.wrMed = new StreamWriter($"data/med_{name}.out"))
+            using (stepsLogger.wrDec = new StreamWriter($"data/dec_{name}.out"))
+            {
+                for (int hashTableSizeBits = 10; hashTableSizeBits < 24; hashTableSizeBits++)
+                {
+                    Console.WriteLine($"Run for size {hashTableSizeBits}");
+
+                    var hashTable = hashTableCreator(hashTableSizeBits);
+                    hashTable.Logger = stepsLogger;
+
+                    stepsLogger.InitNewRun(hashTableSizeBits);
+                    for (int k = 0; k < 100; k++)
+                    {
+                        ulong i = 1;
+                        for (; i < 0.89 * (1 << hashTableSizeBits); i++)
+                        {
+                            hashTable.Add(i, true);
+                        }
+
+                        for (; i < 0.91 * (1 << hashTableSizeBits); i++)
+                        {
+                            hashTable.Add(i, true);
+                            stepsLogger.NewElementBoundary();
+                        }
+                        stepsLogger.FlushElementSegment();
+                        hashTable.Reset();
+                    }
+                    stepsLogger.PrintStatisticalSummaryForOneSize();
+                }
+            }
         }
 
         private static void testSteps(int hashTableSizeBits, ulong[] randNumbers)
