@@ -39,6 +39,7 @@ namespace Hashing
         public void Reset()
         {
             a = rnd.NextULong();
+            a -= (a % 2) - 1; // we want only even numbers
         }
     }
 
