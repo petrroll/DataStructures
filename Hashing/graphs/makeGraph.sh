@@ -9,8 +9,9 @@ color=0
 scale=1
 lw=2
 lwChange=6
-barsEvery=20
 legend="outside right"
+xTitle="X title"
+yTitle="Y title"
 while [ "$1" != "" ]; do
 	case "$1" in
 	-logFileNames)
@@ -28,6 +29,14 @@ while [ "$1" != "" ]; do
 	-title)
 	    shift
 	    title=$1
+	    ;;
+	-xTitle)
+	    shift
+	    xTitle=$1
+	    ;;
+	-yTitle)
+	    shift
+	    yTitle=$1
 	    ;;
 	-logScale)
 	    shift
@@ -48,6 +57,11 @@ while [ "$1" != "" ]; do
 	-legend)
 		shift
 		legend=$1
+		;;
+	-lwChange)
+		shift
+		legend=$1
+		;;
     esac
     shift
 done
@@ -65,8 +79,8 @@ plot=${plot}"set term pdf size 18cm,12cm solid lw 1\n\
 set output \"$output\"\n\
 set grid\n\
 set title \"$title\"\n\
-set xlabel \"N: počet řádků / sloupců matice\"\n\
-set ylabel \"Průměrný čas (ms) / počet načtených bloků na jedno prohození\"\n\
+set xlabel \"$xTitle\"\n\
+set ylabel \"$yTitle\"\n\
 set xtics rotate\n\
 set key $legend\n\
 plot [:$limit]"
