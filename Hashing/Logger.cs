@@ -35,6 +35,12 @@ namespace Hashing
             elements++;
         }
 
+        public void StartNewSegment()
+        {
+            steps = 0;
+            elements = 0;
+        }
+
         public void FlushElementSegment()
         { 
             double average = steps / (double)elements;
@@ -69,7 +75,7 @@ namespace Hashing
             wrDec.WriteLine($"{currentXValue.ToString(CultureInfo.GetCultureInfo("en-US"))} {data.decil.ToString(CultureInfo.GetCultureInfo("en-US"))}");
         }
 
-        public void InitNewRun(int newCurrentX)
+        public void InitNewForOneSize(int newCurrentX)
         {
             elements = 0;
             steps = 0;

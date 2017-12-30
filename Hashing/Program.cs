@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 
 namespace Hashing
@@ -11,7 +9,7 @@ namespace Hashing
 
         static void Main(string[] args)
         {
-            //firstAssigment();
+            firstAssigment();
             secondAssigment();
         }
 
@@ -28,15 +26,17 @@ namespace Hashing
         {
             AdvancedStepsLogger stepsLogger = new AdvancedStepsLogger();
 
-            Func<int, IHashTable<bool, ulong>> linMultishiftCreator = (int tableSizeInBits) => new LinearHashTable<bool>(tableSizeInBits, new MultiShiftHash(tableSizeInBits));
-            Func<int, IHashTable<bool, ulong>> linTableCrator = (int tableSizeInBits) => new LinearHashTable<bool>(tableSizeInBits, new TableHash(tableSizeInBits, 16));
+            (Func<int, IHashTable<bool, ulong>> tableFactory, string name)[] config = {
+                ((int tableSizeInBits) => new LinearHashTable<bool>(tableSizeInBits, new MultiShiftHash(tableSizeInBits)), "linMultiShift"),
+                ((int tableSizeInBits) => new LinearHashTable<bool>(tableSizeInBits, new TableHash(tableSizeInBits, 16)), "linTable")
+            };
 
-            Console.WriteLine($"Started linTable");
-            statisticallyTestOneHashConfig(stepsLogger, linTableCrator, "linTable");
 
-            Console.WriteLine($"Started limMultiShift");
-            statisticallyTestOneHashConfig(stepsLogger, linMultishiftCreator, "linMultishift");
-
+            foreach(var testCase in config)
+            {
+                Console.WriteLine($"Started {testCase.name}");
+                statisticallyTestOneHashConfig(stepsLogger, testCase.tableFactory, testCase.name);
+            }
         }
 
         private static void statisticallyTestOneHashConfig(AdvancedStepsLogger stepsLogger, Func<int, IHashTable<bool, ulong>> hashTableCreator, string name)
@@ -47,14 +47,14 @@ namespace Hashing
             using (stepsLogger.wrMed = new StreamWriter($"data/med_{name}.out"))
             using (stepsLogger.wrDec = new StreamWriter($"data/dec_{name}.out"))
             {
-                for (int hashTableSizeBits = 10; hashTableSizeBits < 24; hashTableSizeBits++)
+                for (int hashTableSizeBits = 5; hashTableSizeBits < 24; hashTableSizeBits++)
                 {
                     Console.WriteLine($"Run for size {hashTableSizeBits}");
 
                     var hashTable = hashTableCreator(hashTableSizeBits);
                     hashTable.Logger = stepsLogger;
 
-                    stepsLogger.InitNewRun(hashTableSizeBits);
+                    stepsLogger.InitNewForOneSize(hashTableSizeBits);
                     for (int k = 0; k < 100; k++)
                     {
                         ulong i = 1;
@@ -63,8 +63,10 @@ namespace Hashing
                             hashTable.Add(i, true);
                         }
 
+                        stepsLogger.StartNewSegment();
                         for (; i < 0.91 * (1 << hashTableSizeBits); i++)
                         {
+
                             hashTable.Add(i, true);
                             stepsLogger.NewElementBoundary();
                         }
